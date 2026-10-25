@@ -149,6 +149,206 @@
       color: #059669;
     }
 
+    .btn-badge.errors {
+      background: #fef2f2;
+      border-color: #fecaca;
+      color: #dc2626;
+      display: none;
+      cursor: pointer;
+    }
+
+    .btn-badge.errors.show {
+      display: inline-flex;
+    }
+
+    .btn-badge.errors:hover {
+      background: #fee2e2;
+      border-color: #fca5a5;
+    }
+
+    .console-drawer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 250px;
+      max-height: 50%;
+      background: #ffffff;
+      border-top: 1px solid var(--border-color);
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+      display: flex;
+      flex-direction: column;
+      transform: translateY(100%);
+      transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 20;
+    }
+
+    .console-drawer.open {
+      transform: translateY(0);
+    }
+
+    .console-drawer-header {
+      height: 38px;
+      padding: 0 12px;
+      background: #f8fafc;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+      user-select: none;
+    }
+
+    .console-drawer-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .drawer-pill {
+      font-size: 10px;
+      font-weight: 700;
+      background: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid #fca5a5;
+      padding: 1px 6px;
+      border-radius: 10px;
+    }
+
+    .console-drawer-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .drawer-action-btn {
+      height: 26px;
+      padding: 0 8px;
+      font-size: 11px;
+      font-weight: 500;
+      border-radius: 5px;
+      border: 1px solid var(--border-color);
+      background: #ffffff;
+      color: var(--text-primary);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s;
+    }
+
+    .drawer-action-btn:hover {
+      background: var(--bg-hover);
+    }
+
+    .drawer-action-btn.primary {
+      background: #7c3aed;
+      color: #ffffff;
+      border-color: #7c3aed;
+      font-weight: 600;
+    }
+
+    .drawer-action-btn.primary:hover {
+      background: #6d28d9;
+    }
+
+    .drawer-action-btn.close {
+      padding: 0 6px;
+      color: var(--text-secondary);
+    }
+
+    .console-drawer-body {
+      flex: 1;
+      overflow-y: auto;
+      background: #ffffff;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 11px;
+    }
+
+    .console-empty-state {
+      padding: 24px;
+      text-align: center;
+      color: var(--text-secondary);
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 12px;
+    }
+
+    .console-error-item {
+      padding: 8px 12px;
+      border-bottom: 1px solid #f1f5f9;
+      background: #fff;
+      transition: background 0.15s;
+    }
+
+    .console-error-item:hover {
+      background: #fdf2f2;
+    }
+
+    .console-error-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .console-error-msg {
+      color: #dc2626;
+      font-weight: 600;
+      word-break: break-word;
+      line-height: 1.4;
+      flex: 1;
+    }
+
+    .console-error-count-badge {
+      font-size: 10px;
+      background: #ef4444;
+      color: #ffffff;
+      border-radius: 10px;
+      padding: 1px 6px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .console-error-loc {
+      color: #64748b;
+      font-size: 10px;
+      margin-top: 3px;
+      word-break: break-all;
+    }
+
+    .console-error-stack {
+      margin-top: 6px;
+      padding: 6px 8px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 4px;
+      color: #475569;
+      white-space: pre-wrap;
+      word-break: break-all;
+      max-height: 120px;
+      overflow-y: auto;
+      font-size: 10px;
+      line-height: 1.4;
+      display: none;
+    }
+
+    .console-error-stack.show {
+      display: block;
+    }
+
+    .console-stack-toggle {
+      font-size: 10px;
+      color: #7c3aed;
+      cursor: pointer;
+      margin-top: 4px;
+      display: inline-block;
+      user-select: none;
+    }
+
+    .console-stack-toggle:hover {
+      text-decoration: underline;
+    }
+
     #btn-inspect.active {
       background: rgba(124, 58, 237, 0.12);
       color: var(--inspect-active);
@@ -365,6 +565,7 @@
 
     <button class="btn btn-badge proxy" id="btn-mode" title="模式切换：Proxy (穿透检查模式) / Direct (原生直连模式)">🛡️ Proxy</button>
     <button class="btn" id="btn-inspect" title="Visual Element Inspector (Pick a component & send it to the agent)">🎯</button>
+    <button class="btn btn-badge errors" id="btn-errors" title="JavaScript Console Errors (Click to inspect and send to Agent)">🐞 <span id="error-badge-count">0</span></button>
     <button class="btn" id="btn-external" title="Open in system browser">↗</button>
   </div>
 
@@ -413,6 +614,27 @@
     <div class="loading-overlay" id="loading-overlay">
       <div class="spinner"></div>
     </div>
+
+    <!-- Console Errors Drawer -->
+    <div class="console-drawer" id="console-drawer">
+      <div class="console-drawer-header">
+        <div class="console-drawer-title">
+          <span style="font-size:14px">🐞</span>
+          <span style="font-weight:600;font-size:12px;color:var(--text-primary)">Console Errors</span>
+          <span class="drawer-pill" id="drawer-error-count">0</span>
+        </div>
+        <div class="console-drawer-actions">
+          <button class="drawer-action-btn primary" id="btn-send-errors-agent" title="Send all errors and stack traces to Agent">
+            Send to Agent 🚀
+          </button>
+          <button class="drawer-action-btn" id="btn-clear-errors" title="Clear errors">Clear</button>
+          <button class="drawer-action-btn close" id="btn-close-drawer" title="Close drawer">✕</button>
+        </div>
+      </div>
+      <div class="console-drawer-body" id="console-drawer-body">
+        <div class="console-empty-state" id="console-empty-state">No JavaScript errors detected on this page.</div>
+      </div>
+    </div>
   </div>
 
   <div class="toast" id="toast"></div>
@@ -432,6 +654,17 @@
     const inspectorBanner = document.getElementById('inspector-banner');
     const loadingOverlay = document.getElementById('loading-overlay');
     const toast = document.getElementById('toast');
+
+    // Console Errors Management Elements
+    const btnErrors = document.getElementById('btn-errors');
+    const errorBadgeCount = document.getElementById('error-badge-count');
+    const consoleDrawer = document.getElementById('console-drawer');
+    const drawerErrorCount = document.getElementById('drawer-error-count');
+    const consoleDrawerBody = document.getElementById('console-drawer-body');
+    const btnCloseDrawer = document.getElementById('btn-close-drawer');
+    const btnClearErrors = document.getElementById('btn-clear-errors');
+    const btnSendErrorsAgent = document.getElementById('btn-send-errors-agent');
+    let capturedErrors = [];
 
     let historyStack = [];
     let historyIndex = -1;
@@ -524,6 +757,8 @@
       urlInput.value = url;
       homeDashboard.classList.add('hidden');
       showLoading();
+      capturedErrors = [];
+      renderErrors();
 
       if (addHistory) {
         historyStack = historyStack.slice(0, historyIndex + 1);
@@ -561,6 +796,8 @@
       homeDashboard.classList.remove('hidden');
       hideLoading();
       setInspectMode(false);
+      capturedErrors = [];
+      renderErrors();
     });
 
     btnBack.addEventListener('click', () => {
@@ -615,6 +852,153 @@
       }
     });
 
+    /* ---- Console Errors Management -------------------------------------- */
+    function renderErrors() {
+      const totalOccurrences = capturedErrors.reduce((sum, item) => sum + (item.count || 1), 0);
+      errorBadgeCount.textContent = totalOccurrences;
+      drawerErrorCount.textContent = totalOccurrences;
+
+      if (capturedErrors.length === 0) {
+        btnErrors.classList.remove('show');
+        consoleDrawer.classList.remove('open');
+        consoleDrawerBody.innerHTML = '<div class="console-empty-state">No JavaScript errors detected on this page.</div>';
+        return;
+      }
+
+      btnErrors.classList.add('show');
+      consoleDrawerBody.innerHTML = '';
+
+      capturedErrors.forEach((err, idx) => {
+        const item = document.createElement('div');
+        item.className = 'console-error-item';
+
+        const header = document.createElement('div');
+        header.className = 'console-error-header';
+
+        const msgSpan = document.createElement('div');
+        msgSpan.className = 'console-error-msg';
+        msgSpan.textContent = `❌ ${err.message}`;
+        header.appendChild(msgSpan);
+
+        if (err.count > 1) {
+          const countBadge = document.createElement('span');
+          countBadge.className = 'console-error-count-badge';
+          countBadge.textContent = `x${err.count}`;
+          header.appendChild(countBadge);
+        }
+
+        item.appendChild(header);
+
+        if (err.filename) {
+          const loc = document.createElement('div');
+          loc.className = 'console-error-loc';
+          let locText = err.filename;
+          if (err.lineno) locText += `:${err.lineno}`;
+          if (err.colno) locText += `:${err.colno}`;
+          loc.textContent = `📍 ${locText}`;
+          item.appendChild(loc);
+        }
+
+        if (err.stack) {
+          const toggle = document.createElement('span');
+          toggle.className = 'console-stack-toggle';
+          toggle.textContent = '▸ Show stack trace';
+
+          const stackBox = document.createElement('div');
+          stackBox.className = 'console-error-stack';
+          stackBox.textContent = err.stack;
+
+          toggle.addEventListener('click', () => {
+            const isOpen = stackBox.classList.toggle('show');
+            toggle.textContent = isOpen ? '▾ Hide stack trace' : '▸ Show stack trace';
+          });
+
+          item.appendChild(toggle);
+          item.appendChild(stackBox);
+        }
+
+        consoleDrawerBody.appendChild(item);
+      });
+    }
+
+    function addConsoleError(err) {
+      if (!err || !err.message) return;
+      const key = `${err.message}@@${err.filename || ''}@@${err.lineno || 0}`;
+      const existing = capturedErrors.find(e => e._key === key);
+      if (existing) {
+        existing.count = (existing.count || 1) + 1;
+        existing.timestamp = err.timestamp || Date.now();
+        if (err.stack && !existing.stack) existing.stack = err.stack;
+      } else {
+        capturedErrors.unshift({
+          ...err,
+          _key: key,
+          count: 1
+        });
+        if (capturedErrors.length > 50) capturedErrors.pop();
+      }
+      renderErrors();
+    }
+
+    btnErrors.addEventListener('click', () => {
+      consoleDrawer.classList.toggle('open');
+    });
+
+    btnCloseDrawer.addEventListener('click', () => {
+      consoleDrawer.classList.remove('open');
+    });
+
+    btnClearErrors.addEventListener('click', () => {
+      capturedErrors = [];
+      renderErrors();
+      showToast('Console errors cleared');
+    });
+
+    btnSendErrorsAgent.addEventListener('click', () => {
+      if (capturedErrors.length === 0) return;
+
+      const totalErrors = capturedErrors.reduce((sum, item) => sum + (item.count || 1), 0);
+      const url = currentRawUrl || 'about:blank';
+      const timeStr = new Date().toLocaleString();
+
+      let errorListText = capturedErrors.map((err, idx) => {
+        let loc = err.filename ? `${err.filename}${err.lineno ? ':' + err.lineno : ''}${err.colno ? ':' + err.colno : ''}` : 'Unknown source';
+        let stackBlock = err.stack ? `\n- **Stack Trace**:\n\`\`\`text\n${err.stack.trim()}\n\`\`\`` : '';
+        let countText = err.count > 1 ? ` (Occurred ${err.count} times)` : '';
+        return `### Error ${idx + 1}: ${err.message}${countText}
+- **Type**: \`${err.type || 'error'}\`
+- **Location**: \`${loc}\`${stackBlock}`;
+      }).join('\n\n');
+
+      const promptText = `I encountered JavaScript runtime error(s) on this page in the in-IDE browser and need your help fixing them.
+
+**Error Context:**
+- **Current URL**: ${url}
+- **Captured At**: ${timeStr}
+- **Distinct Errors**: ${capturedErrors.length} (Total occurrences: ${totalErrors})
+
+**Captured Console Errors:**
+${errorListText}
+
+Please analyze the error message(s) and stack trace(s), locate the root cause in the project source code, and provide the fix.`;
+
+      if (window.sidecar && window.sidecar.agent && typeof window.sidecar.agent.sendMessage === 'function') {
+        window.sidecar.agent.sendMessage(promptText)
+          .then(() => {
+            showToast('✅ Console errors sent to Agent! (Check chat on the left)', 5000);
+            consoleDrawer.classList.remove('open');
+          })
+          .catch((err) => {
+            console.warn('[browser-plugin] agent error send failed:', err);
+            copyFallback(promptText);
+            consoleDrawer.classList.remove('open');
+          });
+      } else {
+        copyFallback(promptText);
+        consoleDrawer.classList.remove('open');
+      }
+    });
+
     /* ---- Messages from the proxied page ----------------------------------
      * The proxied page runs UNTRUSTED JavaScript (it's the website's own code,
      * same-origin with us because it's served through /api/proxy). Treat every
@@ -635,6 +1019,8 @@
         if (!e.data.active && isInspectActive) setInspectMode(false);
       } else if (e.data.type === 'PROXY_NOTICE' && e.data.message) {
         showToast('ℹ️ ' + e.data.message, 5000);
+      } else if (e.data.type === 'CONSOLE_ERROR' && e.data.error) {
+        addConsoleError(e.data.error);
       } else if (e.data.type === 'INSPECTOR_SUBMIT' && e.data.payload) {
         // Security gate: never accept submissions unless inspect mode is on
         if (!isInspectActive) return;

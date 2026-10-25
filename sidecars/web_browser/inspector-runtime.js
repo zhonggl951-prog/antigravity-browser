@@ -58,6 +58,93 @@
     }
   } catch (e) {}
 
+  /* ---- 1c. Console error & exception auto-capture ------------------------- */
+  try {
+    window.addEventListener('error', function (event) {
+      try {
+        var message = event.message || (event.error && event.error.message) || 'Script Error';
+        var errObj = {
+          message: String(message),
+          stack: (event.error && event.error.stack) ? String(event.error.stack) : '',
+          filename: event.filename ? String(event.filename) : (document.baseURI || location.href),
+          lineno: event.lineno || 0,
+          colno: event.colno || 0,
+          type: 'error',
+          timestamp: Date.now()
+        };
+        postToParent({ type: 'CONSOLE_ERROR', error: errObj });
+      } catch (e) {}
+    }, true);
+
+    window.addEventListener('unhandledrejection', function (event) {
+      try {
+        var reason = event.reason;
+        var msg = 'Unhandled Promise Rejection';
+        var stack = '';
+        if (reason) {
+          if (reason instanceof Error) {
+            msg = reason.message || String(reason);
+            stack = reason.stack || '';
+          } else if (typeof reason === 'object') {
+            try { msg = JSON.stringify(reason); } catch (e) { msg = String(reason); }
+          } else {
+            msg = String(reason);
+          }
+        }
+        var errObj = {
+          message: msg,
+          stack: stack,
+          filename: document.baseURI || location.href,
+          lineno: 0,
+          colno: 0,
+          type: 'unhandledrejection',
+          timestamp: Date.now()
+        };
+        postToParent({ type: 'CONSOLE_ERROR', error: errObj });
+      } catch (e) {}
+    }, true);
+
+    if (window.console && console.error) {
+      var origConsoleError = console.error;
+      console.error = function () {
+        try {
+          var args = Array.prototype.slice.call(arguments);
+          var parts = [];
+          var stack = '';
+          for (var i = 0; i < args.length; i++) {
+            var item = args[i];
+            if (item instanceof Error) {
+              parts.push(item.message || String(item));
+              if (!stack && item.stack) stack = item.stack;
+            } else if (typeof item === 'object') {
+              try { parts.push(JSON.stringify(item)); } catch (e) { parts.push(String(item)); }
+            } else {
+              parts.push(String(item));
+            }
+          }
+          var msg = parts.join(' ');
+          if (!stack) {
+            try { stack = (new Error().stack || '').split('\n').slice(2).join('\n'); } catch (e) {}
+          }
+          // Avoid capturing internal browser-plugin logs
+          if (msg && msg.indexOf('[browser-plugin]') === -1) {
+            var errObj = {
+              message: msg,
+              stack: stack,
+              filename: document.baseURI || location.href,
+              lineno: 0,
+              colno: 0,
+              type: 'console.error',
+              timestamp: Date.now()
+            };
+            postToParent({ type: 'CONSOLE_ERROR', error: errObj });
+          }
+        } catch (e) {}
+        return origConsoleError.apply(console, arguments);
+      };
+    }
+  } catch (e) {}
+
   var inspectorActive = false;
   var hoveredElement = null;
   var selectedElement = null;

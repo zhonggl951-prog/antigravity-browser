@@ -35,20 +35,23 @@
   <text x="116" y="90" font-size="14" fill="#64748b">⌂</text>
 
   <!-- URL Address Bar -->
-  <rect x="145" y="70" width="560" height="30" rx="15" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <rect x="145" y="70" width="500" height="30" rx="15" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
   <circle cx="163" cy="85" r="4.5" fill="#10b981"/>
   <text x="176" y="89" font-size="12" fill="#0f172a" font-family="monospace">http://127.0.0.1:7123</text>
   <text x="320" y="89" font-size="11" fill="#94a3b8">— Single-Cell RNA-seq Analyzer</text>
 
-  <!-- Mode Badge & Action Buttons -->
-  <rect x="715" y="72" width="76" height="26" rx="5" fill="#f5f3ff" stroke="#ddd6fe" stroke-width="1"/>
-  <text x="753" y="89" font-size="11" fill="#7c3aed" text-anchor="middle" font-weight="600">🛡️ Proxy</text>
+  <!-- Mode Badge, Inspect, Errors & External Actions -->
+  <rect x="655" y="72" width="70" height="26" rx="5" fill="#f5f3ff" stroke="#ddd6fe" stroke-width="1"/>
+  <text x="690" y="89" font-size="11" fill="#7c3aed" text-anchor="middle" font-weight="600">🛡️ Proxy</text>
 
-  <rect x="798" y="72" width="46" height="26" rx="5" fill="#7c3aed"/>
-  <text x="821" y="89" font-size="12" fill="#ffffff" text-anchor="middle">🎯</text>
+  <rect x="732" y="72" width="34" height="26" rx="5" fill="#7c3aed"/>
+  <text x="749" y="89" font-size="12" fill="#ffffff" text-anchor="middle">🎯</text>
 
-  <rect x="850" y="72" width="34" height="26" rx="5" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
-  <text x="867" y="89" font-size="12" fill="#64748b" text-anchor="middle">↗</text>
+  <rect x="772" y="72" width="56" height="26" rx="5" fill="#fef2f2" stroke="#fecaca" stroke-width="1"/>
+  <text x="800" y="89" font-size="11" fill="#dc2626" text-anchor="middle" font-weight="bold">🐞 1</text>
+
+  <rect x="835" y="72" width="34" height="26" rx="5" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="852" y="89" font-size="12" fill="#64748b" text-anchor="middle">↗</text>
 
   <!-- Web Content Area -->
   <rect x="20" y="108" width="880" height="432" fill="#f8fafc"/>

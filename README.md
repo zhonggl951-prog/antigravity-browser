@@ -23,7 +23,7 @@
 
 ---
 
-`antigravity-browser` is an in-IDE web browser and visual element inspector plugin designed for Google Antigravity's Aux Pane. It allows developers to browse external documentation and preview local development servers right inside the IDE, select DOM elements with a single click, generate visual snapshots, and submit structured modification prompts directly to their AI agent.
+`antigravity-browser` is an in-IDE web browser, visual element inspector, and console error auto-capture plugin designed for Google Antigravity's Aux Pane. It allows developers to browse external documentation and preview local development servers right inside the IDE, select DOM elements with a single click, automatically catch runtime console exceptions, and submit structured modification prompts directly to their AI agent.
 
 <p align="center">
   <img src="assets/preview.svg" alt="Antigravity Browser Preview" width="100%">
@@ -33,9 +33,10 @@
 
 - **Aux Pane In-IDE Browsing**: Operates inside Antigravity's auxiliary side panel without occupying or splitting the primary editor workspace.
 - **Visual Element Inspector (Inspect)**: Hover over any DOM element on the page to highlight its bounding box and CSS selector. Clicking an element opens a prompt dialog that bundles the element's selector, outer HTML snippet, and rendered canvas snapshot into a structured prompt for the agent.
+- **JS Console Error Auto-Capture (🐞)**: Automatically intercepts unhandled runtime exceptions (`window.onerror`), unhandled promise rejections, and `console.error` logs. A warning badge in the toolbar indicates error occurrences, and the expandable Console Drawer allows developers to inspect the stack trace and click **Send to Agent 🚀** to immediately task their AI coding assistant with fixing the bug.
 - **Local Reactive App Support**: Built-in WebSocket target rewriting allows local reactive apps (such as R Shiny, Streamlit, Jupyter, and Vite HMR) to maintain persistent WebSocket connections through the sidecar proxy without disconnection errors.
 - **Dual Execution Modes**:
-  - `🛡️ Proxy`: Routes traffic through the local Node.js proxy with injected DOM inspection and screenshot capabilities.
+  - `🛡️ Proxy`: Routes traffic through the local Node.js proxy with injected DOM inspection, console error interception, and screenshot capabilities.
   - `⚡ Direct`: Loads the URL directly in a native iframe for heavy computational tasks or large file uploads without proxy overhead.
 - **Cross-Platform**: Compatible with macOS, Windows 10/11, and Linux. Includes Windows-specific path normalization, curl command routing, and fallback system browser openers.
 - **Security Hardening**: Blocks cloud provider metadata endpoints (such as `169.254.169.254`), validates conversation UUIDs against path traversal, and enforces body payload caps.
@@ -43,6 +44,7 @@
 ## Use Cases
 
 - **Click-to-Prompt UI Modification**: Select buttons, cards, or tables on a running local dev server, describe desired UI adjustments, and send the request with visual proof to your coding agent.
+- **Instant JS Error Diagnosis**: When a local script or React/Vue component crashes, send the exact error message, file location, and stack trace directly to the agent in one click without manually opening DevTools.
 - **Local Scientific & Data Apps**: Preview R Shiny dashboards, Streamlit apps, and Gradio tools side-by-side with your analysis scripts.
 - **API & Docs Reference**: Browse MDN Web Docs, GitHub repositories, and package documentation without leaving the IDE.
 
@@ -87,6 +89,7 @@ Open the browser sidecar by clicking or outputting its link in an Antigravity co
 2. **Inspect**: Click the `🎯` button in the toolbar to activate inspect mode.
 3. **Select**: Hover over the target UI element on the page and click it.
 4. **Send to Agent**: Describe the change you want in the modal dialog, then press `Cmd/Ctrl + Enter`. The agent receives the element selector, HTML snippet, and visual snapshot.
+5. **Catch & Fix Errors**: If the visited page throws a JavaScript runtime error or console error, click the `🐞` badge in the toolbar to open the Console Drawer, inspect the stack trace, and click **Send to Agent 🚀** to immediately task your agent with fixing the bug.
 
 ## Project Structure
 
