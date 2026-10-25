@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 560" width="100%" height="100%" style="border-radius:12px;background:#090d16;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,sans-serif;">
+  <defs>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="16" stdDeviation="24" flood-color="#000" flood-opacity="0.45"/>
+    </filter>
+    <linearGradient id="purpleGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#6d28d9"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#8b5cf6"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Outer Window Container -->
+  <rect x="20" y="20" width="880" height="520" rx="10" fill="#ffffff" stroke="#e2e8f0" stroke-width="1" filter="url(#shadow)"/>
+
+  <!-- Top Window Bar -->
+  <path d="M 20 30 Q 20 20 30 20 L 890 20 Q 900 20 900 30 L 900 62 L 20 62 Z" fill="#f8fafc"/>
+  <circle cx="44" cy="41" r="5.5" fill="#ef4444"/>
+  <circle cx="62" cy="41" r="5.5" fill="#f59e0b"/>
+  <circle cx="80" cy="41" r="5.5" fill="#10b981"/>
+  <text x="460" y="45" font-size="12" fill="#64748b" text-anchor="middle" font-weight="500">Antigravity — Aux Pane (Web Browser)</text>
+  <line x1="20" y1="62" x2="900" y2="62" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- Toolbar -->
+  <rect x="20" y="62" width="880" height="46" fill="#ffffff"/>
+  <line x1="20" y1="108" x2="900" y2="108" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- Navigation Buttons -->
+  <text x="40" y="90" font-size="14" fill="#64748b" font-weight="bold">←</text>
+  <text x="65" y="90" font-size="14" fill="#94a3b8" font-weight="bold">→</text>
+  <text x="92" y="90" font-size="14" fill="#64748b">↻</text>
+  <text x="116" y="90" font-size="14" fill="#64748b">⌂</text>
+
+  <!-- URL Address Bar -->
+  <rect x="145" y="70" width="560" height="30" rx="15" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <circle cx="163" cy="85" r="4.5" fill="#10b981"/>
+  <text x="176" y="89" font-size="12" fill="#0f172a" font-family="monospace">http://127.0.0.1:7123</text>
+  <text x="320" y="89" font-size="11" fill="#94a3b8">— Single-Cell RNA-seq Analyzer</text>
+
+  <!-- Mode Badge & Action Buttons -->
+  <rect x="715" y="72" width="76" height="26" rx="5" fill="#f5f3ff" stroke="#ddd6fe" stroke-width="1"/>
+  <text x="753" y="89" font-size="11" fill="#7c3aed" text-anchor="middle" font-weight="600">🛡️ Proxy</text>
+
+  <rect x="798" y="72" width="46" height="26" rx="5" fill="#7c3aed"/>
+  <text x="821" y="89" font-size="12" fill="#ffffff" text-anchor="middle">🎯</text>
+
+  <rect x="850" y="72" width="34" height="26" rx="5" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="867" y="89" font-size="12" fill="#64748b" text-anchor="middle">↗</text>
+
+  <!-- Web Content Area -->
+  <rect x="20" y="108" width="880" height="432" fill="#f8fafc"/>
+
+  <!-- In-Page App Sidebar -->
+  <rect x="20" y="108" width="180" height="432" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="40" y="138" font-size="12" fill="#0f172a" font-weight="bold">🧬 scRNAseq Suite</text>
+  <line x1="35" y1="150" x2="185" y2="150" stroke="#f1f5f9" stroke-width="1"/>
+  <rect x="30" y="160" width="160" height="28" rx="4" fill="#f5f3ff"/>
+  <text x="44" y="178" font-size="11" fill="#7c3aed" font-weight="600">📊 UMAP Clustering</text>
+  <text x="44" y="210" font-size="11" fill="#64748b">🏷️ Cell Annotation</text>
+  <text x="44" y="242" font-size="11" fill="#64748b">📈 Marker Genes</text>
+  <text x="44" y="274" font-size="11" fill="#64748b">💬 Cell-Cell Comms</text>
+  <text x="44" y="306" font-size="11" fill="#64748b">⚙️ Pipeline Options</text>
+
+  <!-- In-Page Content Header -->
+  <rect x="216" y="124" width="668" height="64" rx="6" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="236" y="152" font-size="14" fill="#0f172a" font-weight="bold">Dimensionality Reduction: UMAP Embedding</text>
+  <text x="236" y="172" font-size="11" fill="#64748b">Dataset: PBMC 3K · Resolution: 0.6 · Clusters: 8 Identified</text>
+
+  <!-- In-Page Chart Area -->
+  <rect x="216" y="200" width="668" height="324" rx="6" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- Simulated Scatter Plot Points -->
+  <circle cx="340" cy="310" r="4" fill="#3b82f6" opacity="0.6"/>
+  <circle cx="355" cy="305" r="4" fill="#3b82f6" opacity="0.6"/>
+  <circle cx="330" cy="325" r="4" fill="#3b82f6" opacity="0.6"/>
+  <circle cx="360" cy="320" r="4" fill="#3b82f6" opacity="0.6"/>
+  <circle cx="430" cy="270" r="4" fill="#10b981" opacity="0.6"/>
+  <circle cx="445" cy="265" r="4" fill="#10b981" opacity="0.6"/>
+  <circle cx="420" cy="285" r="4" fill="#10b981" opacity="0.6"/>
+  <circle cx="500" cy="350" r="4" fill="#f59e0b" opacity="0.6"/>
+  <circle cx="515" cy="360" r="4" fill="#f59e0b" opacity="0.6"/>
+  <circle cx="490" cy="365" r="4" fill="#f59e0b" opacity="0.6"/>
+
+  <!-- Target Element Bounding Box (Active Hover) -->
+  <rect x="580" y="220" width="284" height="280" rx="6" fill="rgba(139,92,246,0.06)" stroke="#8b5cf6" stroke-width="2" stroke-dasharray="4 2"/>
+  <rect x="580" y="198" width="130" height="20" rx="3" fill="#6d28d9"/>
+  <text x="586" y="212" font-size="10" fill="#ffffff" font-family="monospace" font-weight="600">div.card#umap-plot</text>
+
+  <!-- Injected Element Inspector Modal Dialog -->
+  <rect x="360" y="220" width="460" height="240" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1" filter="url(#shadow)"/>
+  <!-- Modal Header -->
+  <path d="M 360 230 Q 360 220 370 220 L 810 220 Q 820 220 820 230 L 820 258 L 360 258 Z" fill="#f8fafc"/>
+  <text x="378" y="244" font-size="12" fill="#0f172a" font-weight="bold">🎯 Element Inspector</text>
+  <text x="800" y="244" font-size="14" fill="#94a3b8" text-anchor="middle">✕</text>
+  <line x1="360" y1="258" x2="820" y2="258" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- Selector Box -->
+  <rect x="378" y="270" width="424" height="26" rx="5" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="388" y="287" font-size="10" fill="#7c3aed" font-weight="bold">Component:</text>
+  <text x="460" y="287" font-size="10" fill="#0f172a" font-family="monospace">div#main-panel &gt; div.card#umap-plot</text>
+
+  <!-- Prompt Input Textarea -->
+  <rect x="378" y="306" width="424" height="88" rx="6" fill="#ffffff" stroke="#8b5cf6" stroke-width="1.5"/>
+  <text x="390" y="328" font-size="11" fill="#0f172a">Recolor cluster 3 with viridis palette, and add a tooltip showing</text>
+  <text x="390" y="348" font-size="11" fill="#0f172a">the top 3 expressed marker genes when hovering over a cluster.</text>
+  <line x1="722" y1="337" x2="722" y2="350" stroke="#8b5cf6" stroke-width="1.5"/>
+
+  <!-- Modal Footer Actions -->
+  <circle cx="388" cy="418" r="4" fill="#10b981"/>
+  <text x="398" y="422" font-size="10" fill="#64748b">Visual snapshot attached (PNG · html2canvas)</text>
+
+  <rect x="650" y="406" width="60" height="26" rx="5" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="680" y="423" font-size="11" fill="#475569" text-anchor="middle">Cancel</text>
+
+  <rect x="718" y="406" width="84" height="26" rx="5" fill="url(#purpleGrad)"/>
+  <text x="760" y="423" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="bold">Send 🚀</text>
+</svg>
