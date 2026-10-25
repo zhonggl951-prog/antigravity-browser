@@ -4,7 +4,7 @@
     "server.mjs"
   ],
   "display_name": "Web Browser",
-  "description": "In-IDE Web Browser sidecar in Aux Pane",
+  "description": "In-IDE Web Browser sidecar in Aux Pane with visual element inspector",
   "has_web_ui": true,
   "restart_policy": "always",
   "ui_config": {

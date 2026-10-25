@@ -2,5 +2,5 @@
   "name": "browser",
   "displayName": "Web Browser",
   "version": "1.1.0",
-  "description": "In-IDE Web Browser for Antigravity Aux Pane"
+  "description": "In-IDE Web Browser & Visual Element Inspector for Google Antigravity Aux Pane"
 }

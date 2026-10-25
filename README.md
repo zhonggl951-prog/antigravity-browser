@@ -9,6 +9,8 @@
 
 Google Antigravity 辅助面板（Aux Pane）内置网页浏览器与前端审查插件。支持网页浏览、DOM 元素点选审查、局部视觉快照生成与 Agent 联动。
 
+An in-IDE web browser and visual element inspector plugin for Google Antigravity's Aux Pane. Browse web pages, pick DOM components, generate visual snapshots, and inspect local reactive applications (R Shiny, Streamlit, Vite) directly within the IDE.
+
 ## 功能
 
 - **辅助面板浏览**：在 Antigravity 右侧 Aux Pane 内直接打开外部网站与本地 Web 开发服务，不抢占主工作区。
