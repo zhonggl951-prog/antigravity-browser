@@ -57,13 +57,18 @@ function escapeHtml(s) {
 function errorJson(status, message) {
   return new Response(JSON.stringify({ error: message }), {
     contentType: 'application/json',
-    status
+    status,
+    headers: { 'Access-Control-Allow-Origin': '*' }
   });
 }
 
 function errorHtml(status, message) {
   const body = `<!DOCTYPE html><html><body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#ffffff;color:#0f172a;display:flex;align-items:center;justify-content:center;height:100vh;margin:0"><div style="text-align:center;max-width:80%"><div style="font-size:36px;margin-bottom:12px">⚠️</div><div>${message}</div></div></body></html>`;
-  return new Response(body, { contentType: 'text/html; charset=utf-8', status });
+  return new Response(body, {
+    contentType: 'text/html; charset=utf-8',
+    status,
+    headers: { 'Access-Control-Allow-Origin': '*' }
+  });
 }
 
 function normalizeCharset(cs) {
@@ -287,12 +292,22 @@ app.api('/api/proxy', async (data) => {
           const html = decodeBodyText(body, contentType || '');
           return done(new Response(injectRuntime(html, finalUrl), {
             contentType: 'text/html; charset=utf-8',
-            status: statusCode
+            status: statusCode,
+            headers: {
+              'Access-Control-Allow-Origin': '*',
+              'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS, HEAD',
+              'Access-Control-Allow-Headers': '*'
+            }
           }));
         }
         return done(new Response(body, {
           contentType: contentType || 'application/octet-stream',
-          status: statusCode
+          status: statusCode,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS, HEAD',
+            'Access-Control-Allow-Headers': '*'
+          }
         }));
       });
 

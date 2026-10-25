@@ -28,7 +28,63 @@
     return null;
   };
 
-  /* ---- 1b. WebSocket target rewrite for local apps (R Shiny, Streamlit, Vite) ---- */
+  /* ---- 1a. Fix pathname for SPA client-side routers (Next.js, Vue Router, Remix) ---- */
+  try {
+    var rawTarget = window.__AG_TARGET_URL || (document.baseURI && document.baseURI !== location.href ? document.baseURI : '');
+    if (rawTarget && location.pathname.startsWith('/api/proxy')) {
+      var targetParsed = new URL(rawTarget);
+      var targetPath = (targetParsed.pathname || '/') + (targetParsed.search || '') + (targetParsed.hash || '');
+      history.replaceState(history.state, '', targetPath);
+    }
+  } catch (e) {}
+
+  /* ---- 1b. Transparent fetch/XHR proxy rewrite for cross-origin SPAs ---- */
+  try {
+    var rawTargetForFetch = window.__AG_TARGET_URL || (document.baseURI && document.baseURI !== location.href ? document.baseURI : '');
+    if (rawTargetForFetch) {
+      var parsedTargetOrigin = new URL(rawTargetForFetch).origin;
+
+      if (window.fetch) {
+        var origFetch = window.fetch;
+        window.fetch = function (input, init) {
+          try {
+            var urlStr = (typeof input === 'string') ? input : (input && input.url ? input.url : '');
+            if (urlStr) {
+              var resolved = new URL(urlStr, document.baseURI || rawTargetForFetch);
+              // If targeting the external website from our sidecar host, proxy it through /api/proxy to bypass CORS
+              if (resolved.origin === parsedTargetOrigin && resolved.origin !== location.origin) {
+                var proxyUrl = '/api/proxy?url=' + encodeURIComponent(resolved.href);
+                if (typeof input === 'string') {
+                  return origFetch.call(this, proxyUrl, init);
+                } else if (input instanceof Request) {
+                  var newReq = new Request(proxyUrl, input);
+                  return origFetch.call(this, newReq, init);
+                }
+              }
+            }
+          } catch (e) {}
+          return origFetch.apply(this, arguments);
+        };
+      }
+
+      if (window.XMLHttpRequest) {
+        var origOpen = XMLHttpRequest.prototype.open;
+        XMLHttpRequest.prototype.open = function (method, url, async, user, password) {
+          try {
+            if (typeof url === 'string') {
+              var resolvedXhr = new URL(url, document.baseURI || rawTargetForFetch);
+              if (resolvedXhr.origin === parsedTargetOrigin && resolvedXhr.origin !== location.origin) {
+                url = '/api/proxy?url=' + encodeURIComponent(resolvedXhr.href);
+              }
+            }
+          } catch (e) {}
+          return origOpen.apply(this, arguments);
+        };
+      }
+    }
+  } catch (e) {}
+
+  /* ---- 1c. WebSocket target rewrite for local apps (R Shiny, Streamlit, Vite) ---- */
   try {
     var rawTarget = window.__AG_TARGET_URL || (document.baseURI && document.baseURI !== location.href ? document.baseURI : '');
     if (window.WebSocket && rawTarget) {

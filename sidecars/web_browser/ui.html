@@ -137,16 +137,22 @@
       color: var(--text-primary);
     }
 
+    .btn-badge.auto {
+      background: #f0fdf4;
+      border-color: #bbf7d0;
+      color: #15803d;
+    }
+
     .btn-badge.proxy {
-      background: #f5f3ff;
-      border-color: #ddd6fe;
-      color: #7c3aed;
+      background: #eff6ff;
+      border-color: #bfdbfe;
+      color: #1d4ed8;
     }
 
     .btn-badge.direct {
-      background: #ecfdf5;
-      border-color: #a7f3d0;
-      color: #059669;
+      background: #f8fafc;
+      border-color: #e2e8f0;
+      color: #475569;
     }
 
     .btn-badge.errors {
@@ -583,7 +589,7 @@
       <input type="text" class="url-input" id="url-input" placeholder="Enter URL or search (e.g. github.com, smithery.ai, localhost:3000)..." spellcheck="false" autocomplete="off" />
     </div>
 
-    <button class="btn btn-badge proxy" id="btn-mode" title="Mode: Proxy (injected inspection) / Direct (native embed)">Proxy</button>
+    <button class="btn btn-badge auto" id="btn-mode" title="Mode: Auto (Automatically selects Direct or Proxy based on site requirements. Click to cycle)">Auto</button>
     <button class="btn" id="btn-inspect" title="Inspect Element (Select a component to prompt Agent)">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="9"/>
@@ -697,26 +703,59 @@
     let historyStack = [];
     let historyIndex = -1;
     let currentRawUrl = '';
-    let currentMode = 'proxy'; // 'proxy' or 'direct'
+    let currentMode = 'auto'; // 'auto' (default) | 'proxy' | 'direct'
+    let effectiveMode = 'direct';
     let isInspectActive = false;
     let toastTimer = null;
 
+    // Sites known to strictly reject iframe embedding via X-Frame-Options or frame-ancestors
+    const KNOWN_FRAME_BLOCKED = [
+      'github.com',
+      'google.com',
+      'twitter.com',
+      'x.com',
+      'linkedin.com',
+      'facebook.com',
+      'notion.so',
+      'medium.com',
+      'figma.com'
+    ];
+
+    function isFrameBlocked(url) {
+      try {
+        const host = new URL(url).hostname.toLowerCase();
+        return KNOWN_FRAME_BLOCKED.some(b => host === b || host.endsWith('.' + b));
+      } catch {
+        return false;
+      }
+    }
+
     function updateModeButton() {
-      if (currentMode === 'proxy') {
+      if (currentMode === 'auto') {
+        btnMode.textContent = 'Auto';
+        btnMode.className = 'btn btn-badge auto';
+        btnMode.title = `Mode: Auto (Active: ${effectiveMode === 'proxy' ? 'Proxy' : 'Direct'} mode. Click to cycle)`;
+      } else if (currentMode === 'proxy') {
         btnMode.textContent = 'Proxy';
         btnMode.className = 'btn btn-badge proxy';
-        btnMode.title = 'Mode: Proxy (Enables component inspection & snapshots)';
+        btnMode.title = 'Mode: Forced Proxy (Strips X-Frame-Options & injects inspector. Click to cycle)';
       } else {
         btnMode.textContent = 'Direct';
         btnMode.className = 'btn btn-badge direct';
-        btnMode.title = 'Mode: Direct (Native embed, no proxy rewrite)';
+        btnMode.title = 'Mode: Forced Direct (Native embed, full SPAs & cookies. Click to cycle)';
       }
     }
 
     btnMode.addEventListener('click', () => {
-      currentMode = currentMode === 'proxy' ? 'direct' : 'proxy';
+      if (currentMode === 'auto') {
+        currentMode = 'proxy';
+      } else if (currentMode === 'proxy') {
+        currentMode = 'direct';
+      } else {
+        currentMode = 'auto';
+      }
       updateModeButton();
-      showToast(`Switched to ${currentMode === 'proxy' ? 'Proxy' : 'Direct'} mode`);
+      showToast(`Mode: ${currentMode === 'auto' ? 'Auto (Smart)' : (currentMode === 'proxy' ? 'Forced Proxy' : 'Forced Direct')}`, 2500);
       if (currentRawUrl) {
         navigateTo(currentRawUrl, false);
       }
@@ -748,12 +787,17 @@
     }
 
     btnInspect.addEventListener('click', () => {
-      if (currentMode === 'direct') {
-        showToast('Direct mode active. Switch to Proxy mode to inspect elements and capture snapshots.', 4000);
-        return;
-      }
       if (!currentRawUrl) {
         showToast('Navigate to a page first, then use the element inspector.', 3500);
+        return;
+      }
+      // If currently running in Direct mode, seamlessly switch to Proxy mode so inspector runtime is available
+      if (effectiveMode === 'direct') {
+        showToast('Enabling Inspector (switching to proxy mode)...', 2500);
+        effectiveMode = 'proxy';
+        updateModeButton();
+        navigateTo(currentRawUrl, false, 'proxy');
+        setTimeout(() => setInspectMode(true), 450);
         return;
       }
       setInspectMode(!isInspectActive);
@@ -766,7 +810,7 @@
       if (e.key === 'Escape' && isInspectActive) setInspectMode(false);
     });
 
-    function navigateTo(input, addHistory = true) {
+    function navigateTo(input, addHistory = true, forcedEffectiveMode = null) {
       let trimmed = input.trim();
       if (!trimmed) return;
 
@@ -795,7 +839,26 @@
         updateNavButtons();
       }
 
-      if (currentMode === 'direct') {
+      // Determine effective mode
+      if (forcedEffectiveMode) {
+        effectiveMode = forcedEffectiveMode;
+      } else if (currentMode === 'proxy') {
+        effectiveMode = 'proxy';
+      } else if (currentMode === 'direct') {
+        effectiveMode = 'direct';
+      } else {
+        // Auto mode:
+        // Known frame-blocked sites (e.g. GitHub) require proxy; modern SPAs/docs prefer Direct
+        if (isFrameBlocked(url)) {
+          effectiveMode = 'proxy';
+        } else {
+          effectiveMode = 'direct';
+        }
+      }
+
+      updateModeButton();
+
+      if (effectiveMode === 'direct') {
         webFrame.src = url;
       } else {
         webFrame.src = '/api/proxy?url=' + encodeURIComponent(url);
@@ -855,6 +918,16 @@
             webFrame.contentWindow.postMessage({ type: 'SET_INSPECTOR', active: true }, location.origin);
           } catch (e) {}
         }, 100);
+      }
+    });
+
+    webFrame.addEventListener('error', () => {
+      hideLoading();
+      if (currentMode === 'auto' && effectiveMode === 'direct' && currentRawUrl) {
+        showToast('Direct embed blocked. Auto-switching to Proxy mode...', 3500);
+        effectiveMode = 'proxy';
+        updateModeButton();
+        navigateTo(currentRawUrl, false, 'proxy');
       }
     });
 
@@ -966,6 +1039,18 @@
         if (capturedErrors.length > 50) capturedErrors.pop();
       }
       renderErrors();
+
+      // Self-healing: if an SPA client hydration exception occurs while in Proxy mode under Auto mode,
+      // seamlessly auto-recover by reloading in Direct mode.
+      if (currentMode === 'auto' && effectiveMode === 'proxy') {
+        const msg = String(err.message || '');
+        if (msg.includes('Application error: a client-side exception') || msg.includes('Hydration failed') || msg.includes('CORS policy')) {
+          showToast('SPA hydration issue detected. Auto-recovering in Direct mode...', 3500);
+          effectiveMode = 'direct';
+          updateModeButton();
+          navigateTo(currentRawUrl, false, 'direct');
+        }
+      }
     }
 
     btnErrors.addEventListener('click', () => {
