@@ -365,9 +365,9 @@
       justify-content: center;
       gap: 12px;
       padding: 6px 12px;
-      background: linear-gradient(90deg, rgba(124, 58, 237, 0.08), rgba(124, 58, 237, 0.04), rgba(124, 58, 237, 0.08));
-      border-bottom: 1px solid rgba(124, 58, 237, 0.2);
-      color: #6d28d9;
+      background: #f1f5f9;
+      border-bottom: 1px solid var(--border-color);
+      color: #334155;
       font-size: 12px;
       flex-shrink: 0;
     }
@@ -377,19 +377,19 @@
     }
 
     .inspector-banner kbd {
-      background: #ede9fe;
-      border: 1px solid #c4b5fd;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
       border-radius: 3px;
       padding: 1px 5px;
       font-size: 10px;
       font-family: inherit;
-      color: #5b21b6;
+      color: #475569;
     }
 
     #btn-exit-inspect {
       background: #ffffff;
-      color: #6d28d9;
-      border: 1px solid #c4b5fd;
+      color: #334155;
+      border: 1px solid #cbd5e1;
       border-radius: 4px;
       padding: 2px 8px;
       font-size: 11px;
@@ -398,7 +398,7 @@
     }
 
     #btn-exit-inspect:hover {
-      background: #f5f3ff;
+      background: #f8fafc;
     }
 
     .viewport {
@@ -465,63 +465,81 @@
     }
 
     .home-title {
-      font-size: 28px;
-      font-weight: 700;
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
       margin-bottom: 6px;
-      background: linear-gradient(135deg, #2563eb, #7c3aed);
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
+      color: var(--text-primary);
     }
 
     .home-subtitle {
       color: var(--text-secondary);
-      font-size: 13px;
-      margin-bottom: 36px;
+      font-size: 12px;
+      margin-bottom: 24px;
     }
 
     .quick-links {
       display: flex;
-      gap: 16px;
+      gap: 12px;
       flex-wrap: wrap;
       justify-content: center;
-      max-width: 640px;
+      max-width: 620px;
     }
 
     .quick-card {
-      width: 150px;
-      padding: 16px;
+      width: 180px;
+      padding: 14px 16px;
       background: #ffffff;
       border: 1px solid var(--border-color);
-      border-radius: 12px;
+      border-radius: 8px;
       cursor: pointer;
-      transition: all 0.2s;
-      text-align: center;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+      transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+      text-align: left;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
     }
 
     .quick-card:hover {
-      border-color: var(--accent);
-      transform: translateY(-3px);
-      background: #f8fafc;
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+      border-color: #94a3b8;
+      transform: translateY(-2px);
+      background: #fafafa;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     }
 
-    .quick-card .icon {
-      font-size: 26px;
-      margin-bottom: 8px;
+    .quick-card .card-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .quick-card .icon-svg {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+      color: var(--text-primary);
     }
 
     .quick-card .name {
       font-size: 13px;
       font-weight: 600;
       color: var(--text-primary);
-      margin-bottom: 4px;
     }
 
     .quick-card .desc {
       font-size: 11px;
       color: var(--text-secondary);
+      line-height: 1.4;
+    }
+
+    .error-dot {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #dc2626;
+      margin-right: 2px;
     }
 
     .toast {
@@ -559,52 +577,62 @@
     <button class="btn" id="btn-home" title="Home">⌂</button>
 
     <div class="url-bar-wrapper">
-      <span class="url-icon">🔒</span>
-      <input type="text" class="url-input" id="url-input" placeholder="输入网址或搜索 (支持本地应用 http://127.0.0.1:7123)…" spellcheck="false" autocomplete="off" />
+      <span class="url-icon">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </span>
+      <input type="text" class="url-input" id="url-input" placeholder="Enter URL or search (e.g. github.com, smithery.ai, localhost:3000)..." spellcheck="false" autocomplete="off" />
     </div>
 
-    <button class="btn btn-badge proxy" id="btn-mode" title="模式切换：Proxy (穿透检查模式) / Direct (原生直连模式)">🛡️ Proxy</button>
-    <button class="btn" id="btn-inspect" title="Visual Element Inspector (Pick a component & send it to the agent)">🎯</button>
-    <button class="btn btn-badge errors" id="btn-errors" title="JavaScript Console Errors (Click to inspect and send to Agent)">🐞 <span id="error-badge-count">0</span></button>
+    <button class="btn btn-badge proxy" id="btn-mode" title="Mode: Proxy (injected inspection) / Direct (native embed)">Proxy</button>
+    <button class="btn" id="btn-inspect" title="Inspect Element (Select a component to prompt Agent)">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="9"/>
+        <line x1="12" y1="2" x2="12" y2="6"/>
+        <line x1="12" y1="18" x2="12" y2="22"/>
+        <line x1="2" y1="12" x2="6" y2="12"/>
+        <line x1="18" y1="12" x2="22" y2="12"/>
+      </svg>
+    </button>
+    <button class="btn btn-badge errors" id="btn-errors" title="JavaScript Console Errors">
+      <span class="error-dot"></span>
+      <span>Errors</span>
+      <span id="error-badge-count">0</span>
+    </button>
     <button class="btn" id="btn-external" title="Open in system browser">↗</button>
   </div>
 
   <div class="inspector-banner" id="inspector-banner">
-    <span>🎯 <strong>Inspect Mode</strong> — 点击任意组件以选择，然后描述你想要的修改</span>
+    <span><strong>Inspect Mode</strong> — Click any element on the page to inspect & prompt Agent</span>
     <kbd>Esc</kbd>
-    <span>或</span>
-    <button id="btn-exit-inspect">退出检查模式</button>
+    <span>or</span>
+    <button id="btn-exit-inspect">Exit</button>
   </div>
 
   <div class="viewport">
     <div class="home-dashboard" id="home-dashboard">
-      <div class="home-title">🌐 Web Browser</div>
-      <div class="home-subtitle">支持本地生信工具与外部网页 · 目标元素检查器与视觉快照已就绪</div>
+      <div class="home-title">Web Browser</div>
+      <div class="home-subtitle">In-IDE browser with element inspector and console debugging</div>
       <div class="quick-links">
-        <div class="quick-card" data-url="http://127.0.0.1:7123">
-          <div class="icon">🧬</div>
-          <div class="name">scRNAseq</div>
-          <div class="desc">本地单细胞网页工具</div>
-        </div>
-        <div class="quick-card" data-url="https://duckduckgo.com">
-          <div class="icon">🦆</div>
-          <div class="name">DuckDuckGo</div>
-          <div class="desc">Privacy-first search</div>
-        </div>
         <div class="quick-card" data-url="https://github.com">
-          <div class="icon">🐙</div>
-          <div class="name">GitHub</div>
-          <div class="desc">Code hosting</div>
+          <div class="card-header">
+            <svg class="icon-svg" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+            <div class="name">GitHub</div>
+          </div>
+          <div class="desc">Code, repositories & issues</div>
         </div>
-        <div class="quick-card" data-url="https://news.ycombinator.com">
-          <div class="icon">🗣️</div>
-          <div class="name">Hacker News</div>
-          <div class="desc">Tech news</div>
+        <div class="quick-card" data-url="https://smithery.ai/skills">
+          <div class="card-header">
+            <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 12v10"/></svg>
+            <div class="name">Smithery</div>
+          </div>
+          <div class="desc">Agent skills & MCP registry</div>
         </div>
-        <div class="quick-card" data-url="https://developer.mozilla.org">
-          <div class="icon">📚</div>
-          <div class="name">MDN Docs</div>
-          <div class="desc">Web reference</div>
+        <div class="quick-card" data-url="https://huggingface.co">
+          <div class="card-header">
+            <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><circle cx="19" cy="6" r="2"/><circle cx="5" cy="6" r="2"/><circle cx="19" cy="18" r="2"/><circle cx="5" cy="18" r="2"/><line x1="12" y1="9" x2="6.5" y2="7"/><line x1="12" y1="9" x2="17.5" y2="7"/><line x1="12" y1="15" x2="6.5" y2="17"/><line x1="12" y1="15" x2="17.5" y2="17"/></svg>
+            <div class="name">Hugging Face</div>
+          </div>
+          <div class="desc">Open models, datasets & Spaces</div>
         </div>
       </div>
     </div>
@@ -619,13 +647,13 @@
     <div class="console-drawer" id="console-drawer">
       <div class="console-drawer-header">
         <div class="console-drawer-title">
-          <span style="font-size:14px">🐞</span>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
           <span style="font-weight:600;font-size:12px;color:var(--text-primary)">Console Errors</span>
           <span class="drawer-pill" id="drawer-error-count">0</span>
         </div>
         <div class="console-drawer-actions">
           <button class="drawer-action-btn primary" id="btn-send-errors-agent" title="Send all errors and stack traces to Agent">
-            Send to Agent 🚀
+            Send to Agent
           </button>
           <button class="drawer-action-btn" id="btn-clear-errors" title="Clear errors">Clear</button>
           <button class="drawer-action-btn close" id="btn-close-drawer" title="Close drawer">✕</button>
@@ -675,20 +703,20 @@
 
     function updateModeButton() {
       if (currentMode === 'proxy') {
-        btnMode.textContent = '🛡️ Proxy';
+        btnMode.textContent = 'Proxy';
         btnMode.className = 'btn btn-badge proxy';
-        btnMode.title = '当前模式: Proxy 穿透检查模式 (支持元素点选与多模态快照)';
+        btnMode.title = 'Mode: Proxy (Enables component inspection & snapshots)';
       } else {
-        btnMode.textContent = '⚡ Direct';
+        btnMode.textContent = 'Direct';
         btnMode.className = 'btn btn-badge direct';
-        btnMode.title = '当前模式: Direct 原生直连模式 (适合原生交互本地工具)';
+        btnMode.title = 'Mode: Direct (Native embed, no proxy rewrite)';
       }
     }
 
     btnMode.addEventListener('click', () => {
       currentMode = currentMode === 'proxy' ? 'direct' : 'proxy';
       updateModeButton();
-      showToast(`已切换至 ${currentMode === 'proxy' ? '🛡️ Proxy 代理模式' : '⚡ Direct 直连模式'}`);
+      showToast(`Switched to ${currentMode === 'proxy' ? 'Proxy' : 'Direct'} mode`);
       if (currentRawUrl) {
         navigateTo(currentRawUrl, false);
       }
@@ -721,11 +749,11 @@
 
     btnInspect.addEventListener('click', () => {
       if (currentMode === 'direct') {
-        showToast('ℹ️ Direct 直连模式使用原生内嵌。若需点选组件并截取快照发给 Agent，请先点击顶部切换为 🛡️ Proxy 模式。', 4500);
+        showToast('Direct mode active. Switch to Proxy mode to inspect elements and capture snapshots.', 4000);
         return;
       }
       if (!currentRawUrl) {
-        showToast('ℹ️ Navigate to a page first, then use the element inspector.');
+        showToast('Navigate to a page first, then use the element inspector.', 3500);
         return;
       }
       setInspectMode(!isInspectActive);
@@ -985,7 +1013,7 @@ Please analyze the error message(s) and stack trace(s), locate the root cause in
       if (window.sidecar && window.sidecar.agent && typeof window.sidecar.agent.sendMessage === 'function') {
         window.sidecar.agent.sendMessage(promptText)
           .then(() => {
-            showToast('✅ Console errors sent to Agent! (Check chat on the left)', 5000);
+            showToast('Console errors sent to Agent.', 4000);
             consoleDrawer.classList.remove('open');
           })
           .catch((err) => {
@@ -1069,7 +1097,7 @@ The snapshot is saved locally as a file. Please analyze it (use your file-readin
 
         if (window.sidecar && window.sidecar.agent && typeof window.sidecar.agent.sendMessage === 'function') {
           window.sidecar.agent.sendMessage(promptText)
-            .then(() => showToast('✅ Component & Visual Snapshot sent to agent! (Check your chat)', 5000))
+            .then(() => showToast('Component and snapshot sent to Agent.', 4000))
             .catch((err) => {
               console.warn('[browser-plugin] agent send failed:', err);
               copyFallback(promptText);
@@ -1083,12 +1111,12 @@ The snapshot is saved locally as a file. Please analyze it (use your file-readin
     function copyFallback(text) {
       if (navigator.clipboard) {
         navigator.clipboard.writeText(text).then(() => {
-          showToast('📋 Request copied to clipboard, paste into chat on the left!', 5000);
+          showToast('Request copied to clipboard. Paste into chat to send.', 4000);
         }).catch(() => {
-          showToast('Request generated. Paste into chat on the left.', 4000);
+          showToast('Request generated. Paste into chat to send.', 4000);
         });
       } else {
-        showToast('Request generated. Paste into chat on the left.', 4000);
+        showToast('Request generated. Paste into chat to send.', 4000);
       }
     }
   </script>

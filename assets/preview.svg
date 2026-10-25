@@ -77,16 +77,17 @@
     <text x="618" y="100" font-size="10.5" fill="#059669" text-anchor="middle" font-weight="700">200 OK</text>
 
     <!-- Mode Badge: Proxy -->
-    <rect x="680" y="82" width="80" height="28" rx="6" fill="#f5f3ff" stroke="#ddd6fe" stroke-width="1"/>
-    <text x="720" y="100" font-size="11.5" fill="#7c3aed" text-anchor="middle" font-weight="600">🛡️ Proxy</text>
+    <rect x="680" y="82" width="76" height="28" rx="6" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1"/>
+    <text x="718" y="100" font-size="11.5" fill="#2563eb" text-anchor="middle" font-weight="600">Proxy</text>
 
-    <!-- Inspect Button (Active Glowing State) -->
-    <rect x="770" y="82" width="90" height="28" rx="6" fill="#7c3aed"/>
-    <text x="815" y="100" font-size="11.5" fill="#ffffff" text-anchor="middle" font-weight="600">🎯 Inspect</text>
+    <!-- Inspect Button (Active State) -->
+    <rect x="764" y="82" width="88" height="28" rx="6" fill="#0f172a"/>
+    <text x="808" y="100" font-size="11.5" fill="#ffffff" text-anchor="middle" font-weight="600">Inspect</text>
 
     <!-- Error Badge (Active Alert State) -->
-    <rect x="870" y="82" width="84" height="28" rx="6" fill="#fef2f2" stroke="#fca5a5" stroke-width="1"/>
-    <text x="912" y="100" font-size="11.5" fill="#dc2626" text-anchor="middle" font-weight="700">🐞 1 Error</text>
+    <rect x="860" y="82" width="94" height="28" rx="6" fill="#fef2f2" stroke="#fca5a5" stroke-width="1"/>
+    <circle cx="876" cy="96" r="3.5" fill="#dc2626"/>
+    <text x="912" y="100" font-size="11" fill="#dc2626" text-anchor="middle" font-weight="600">Errors: 1</text>
 
     <!-- External Link -->
     <rect x="964" y="82" width="38" height="28" rx="6" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
@@ -191,32 +192,37 @@
     <g transform="translate(540, 218)">
       <rect width="476" height="236" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
       
-      <!-- Modal Header -->
+      <!-- Modal Header (Draggable) -->
       <path d="M 0 8 Q 0 0 8 0 L 468 0 Q 476 0 476 8 L 476 38 L 0 38 Z" fill="#f8fafc"/>
-      <text x="18" y="24" font-size="13" fill="#0f172a" font-weight="700">🎯 Element Inspector — Click-to-Prompt</text>
-      <text x="456" y="24" font-size="15" fill="#94a3b8" text-anchor="middle">✕</text>
+      <circle cx="18" cy="16" r="1.5" fill="#94a3b8"/><circle cx="23" cy="16" r="1.5" fill="#94a3b8"/>
+      <circle cx="18" cy="20" r="1.5" fill="#94a3b8"/><circle cx="23" cy="20" r="1.5" fill="#94a3b8"/>
+      <circle cx="18" cy="24" r="1.5" fill="#94a3b8"/><circle cx="23" cy="24" r="1.5" fill="#94a3b8"/>
+      <text x="32" y="24" font-size="12.5" fill="#0f172a" font-weight="600">Inspect Element</text>
+      <rect x="130" y="11" width="56" height="18" rx="3" fill="#e2e8f0"/>
+      <text x="158" y="24" font-size="10" fill="#334155" text-anchor="middle" font-weight="600" font-family="ui-monospace,SFMono-Regular,Menlo,monospace">DIV</text>
+      <text x="456" y="24" font-size="13" fill="#94a3b8" text-anchor="middle">✕</text>
       <line x1="0" y1="38" x2="476" y2="38" stroke="#e2e8f0" stroke-width="1"/>
 
       <!-- Component Badge -->
       <rect x="18" y="48" width="440" height="26" rx="5" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
-      <text x="28" y="65" font-size="11" fill="#7c3aed" font-weight="700">Component:</text>
-      <text x="104" y="65" font-size="11" fill="#0f172a" font-family="ui-monospace,SFMono-Regular,Menlo,monospace">div#umap-plot &gt; g.cluster-3</text>
+      <text x="28" y="65" font-size="11" fill="#475569" font-weight="600">Selector:</text>
+      <text x="88" y="65" font-size="11" fill="#0f172a" font-family="ui-monospace,SFMono-Regular,Menlo,monospace">div#umap-plot &gt; g.cluster-3</text>
 
       <!-- Prompt Input Box -->
-      <rect x="18" y="82" width="440" height="92" rx="6" fill="#ffffff" stroke="#7c3aed" stroke-width="1.5"/>
+      <rect x="18" y="82" width="440" height="92" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"/>
       <text x="30" y="105" font-size="12" fill="#0f172a">Filter cells in cluster 3, highlight differential markers</text>
       <text x="30" y="127" font-size="12" fill="#0f172a">(CD14, LYZ), and export publication-ready 600 DPI vector PDF.</text>
-      <line x1="410" y1="117" x2="410" y2="131" stroke="#7c3aed" stroke-width="1.5"/>
+      <line x1="410" y1="117" x2="410" y2="131" stroke="#0f172a" stroke-width="1.5"/>
 
       <!-- Modal Footer -->
-      <circle cx="28" cy="204" r="4" fill="#10b981"/>
-      <text x="38" y="208" font-size="11" fill="#64748b">Visual snapshot attached (PNG)</text>
+      <circle cx="28" cy="204" r="4" fill="#64748b"/>
+      <text x="38" y="208" font-size="11" fill="#64748b">Snapshot included</text>
 
-      <rect x="264" y="190" width="64" height="28" rx="5" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1"/>
-      <text x="296" y="208" font-size="11" fill="#475569" text-anchor="middle" font-weight="600">Cancel</text>
+      <rect x="270" y="190" width="58" height="28" rx="5" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+      <text x="299" y="208" font-size="11" fill="#475569" text-anchor="middle" font-weight="500">Cancel</text>
 
-      <rect x="336" y="190" width="124" height="28" rx="5" fill="url(#btnGrad)"/>
-      <text x="398" y="208" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="700">Send to Agent 🚀</text>
+      <rect x="336" y="190" width="124" height="28" rx="5" fill="#0f172a"/>
+      <text x="398" y="208" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="500">Send to Agent ↵</text>
     </g>
 
     <!-- ==================== CONSOLE ERRORS DRAWER (v1.2.0 FEATURE) ==================== -->
@@ -226,18 +232,18 @@
       <line x1="0" y1="0" x2="1000" y2="0" stroke="#e2e8f0" stroke-width="1.5"/>
       
       <!-- Drawer Title with Badge -->
-      <text x="18" y="23" font-size="14">🐞</text>
-      <text x="40" y="23" font-size="12.5" fill="#0f172a" font-weight="700">Console Errors</text>
+      <circle cx="26" cy="18" r="4.5" fill="#dc2626"/>
+      <text x="38" y="22" font-size="12" fill="#0f172a" font-weight="600">Console Errors</text>
       
-      <rect x="136" y="11" width="24" height="16" rx="8" fill="#fee2e2" stroke="#fca5a5" stroke-width="1"/>
-      <text x="148" y="23" font-size="10" fill="#b91c1c" text-anchor="middle" font-weight="700">1</text>
+      <rect x="136" y="10" width="22" height="16" rx="8" fill="#fee2e2" stroke="#fca5a5" stroke-width="1"/>
+      <text x="147" y="22" font-size="10" fill="#b91c1c" text-anchor="middle" font-weight="700">1</text>
 
       <!-- Drawer Action Buttons -->
-      <rect x="710" y="5" width="168" height="26" rx="5" fill="url(#errorBtnGrad)"/>
-      <text x="794" y="22" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="700">Send Error to Agent 🚀</text>
+      <rect x="736" y="5" width="142" height="26" rx="5" fill="#0f172a"/>
+      <text x="807" y="22" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="500">Send to Agent</text>
 
       <rect x="888" y="5" width="56" height="26" rx="5" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
-      <text x="916" y="22" font-size="11" fill="#64748b" text-anchor="middle" font-weight="600">Clear</text>
+      <text x="916" y="22" font-size="11" fill="#64748b" text-anchor="middle" font-weight="500">Clear</text>
 
       <rect x="952" y="5" width="36" height="26" rx="5" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
       <text x="970" y="22" font-size="12" fill="#94a3b8" text-anchor="middle">✕</text>

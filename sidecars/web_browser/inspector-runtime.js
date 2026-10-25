@@ -153,40 +153,121 @@
   /* ---- 2. Hover highlight overlay ---------------------------------------- */
   var overlay = document.createElement('div');
   overlay.id = '__ag_overlay';
-  overlay.style.cssText = 'position:fixed;display:none;pointer-events:none;z-index:2147483640;border:2px solid #8b5cf6;background:rgba(139,92,246,0.18);border-radius:4px;transition:top 0.05s ease,left 0.05s ease,width 0.05s ease,height 0.05s ease;';
+  overlay.style.cssText = 'position:fixed;display:none;pointer-events:none;z-index:2147483640;border:1px solid #2563eb;background:rgba(37,99,235,0.12);box-sizing:border-box;transition:top 0.04s ease,left 0.04s ease,width 0.04s ease,height 0.04s ease;';
 
   var badge = document.createElement('div');
   badge.id = '__ag_badge';
-  badge.style.cssText = 'position:absolute;top:-26px;left:0;background:#6d28d9;color:#fff;font-family:-apple-system,BlinkMacSystemFont,monospace;font-size:11px;padding:2px 8px;border-radius:4px;white-space:nowrap;font-weight:600;box-shadow:0 2px 6px rgba(0,0,0,0.4);letter-spacing:0.3px;';
+  badge.style.cssText = 'position:absolute;top:-22px;left:0;background:#0f172a;color:#f8fafc;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;padding:2px 6px;border-radius:3px;white-space:nowrap;font-weight:500;box-shadow:0 2px 4px rgba(0,0,0,0.15);pointer-events:none;line-height:1.2;';
   overlay.appendChild(badge);
   document.documentElement.appendChild(overlay);
 
   /* ---- 3. Prompt modal ----------------------------------------------------- */
   var modal = document.createElement('div');
   modal.id = '__ag_modal';
-  modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.45);z-index:2147483647;display:none;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;backdrop-filter:blur(3px);';
+  modal.style.cssText = 'position:fixed;top:0;left:0;width:0;height:0;z-index:2147483647;display:none;pointer-events:none;';
   modal.innerHTML = `
-    <div style="background:#ffffff;color:#0f172a;padding:0;border-radius:12px;width:480px;max-width:90%;box-shadow:0 20px 50px rgba(0,0,0,0.18);border:1px solid #e2e8f0;overflow:hidden;">
-      <div style="padding:14px 20px;border-bottom:1px solid #e2e8f0;background:#f8fafc;display:flex;justify-content:space-between;align-items:center;">
-        <span style="font-size:14px;font-weight:600;color:#0f172a;">🎯 Element Inspector</span>
-        <button id="__ag_close" style="background:none;border:none;color:#64748b;font-size:16px;cursor:pointer;padding:4px;line-height:1;">✕</button>
-      </div>
-      <div style="padding:16px 20px;background:#ffffff;">
-        <div style="background:#f8fafc;border-radius:8px;padding:10px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:#475569;margin-bottom:12px;border:1px solid #e2e8f0;">
-          <span style="color:#7c3aed;font-weight:600;">Component:</span>
-          <span id="__ag_selector" style="color:#0f172a;word-break:break-all;"></span>
+    <div id="__ag_dialog" style="position:fixed;pointer-events:auto;background:#ffffff;color:#0f172a;padding:0;border-radius:8px;width:440px;max-width:calc(100vw - 32px);box-shadow:0 12px 32px -4px rgba(15,23,42,0.18),0 0 0 1px rgba(15,23,42,0.08);overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+      <div id="__ag_modal_header" style="padding:10px 14px;border-bottom:1px solid #e2e8f0;background:#f8fafc;display:flex;justify-content:space-between;align-items:center;cursor:grab;user-select:none;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="#94a3b8" style="flex-shrink:0;">
+            <circle cx="4" cy="4" r="1.5"/><circle cx="12" cy="4" r="1.5"/>
+            <circle cx="4" cy="8" r="1.5"/><circle cx="12" cy="8" r="1.5"/>
+            <circle cx="4" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/>
+          </svg>
+          <span style="font-size:12px;font-weight:600;color:#0f172a;letter-spacing:-0.01em;">Inspect Element</span>
+          <span id="__ag_element_tag" style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px;background:#e2e8f0;color:#334155;padding:1px 5px;border-radius:3px;font-weight:600;text-transform:uppercase;"></span>
         </div>
-        <textarea id="__ag_prompt_input" placeholder="What should the agent do with this component? (Cmd/Ctrl+Enter to send)" style="width:100%;height:90px;background:#ffffff;border:1px solid #cbd5e1;border-radius:8px;color:#0f172a;padding:10px;font-size:13px;font-family:inherit;resize:vertical;outline:none;line-height:1.5;box-sizing:border-box;" spellcheck="false"></textarea>
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;">
-          <div id="__ag_hint" style="font-size:11px;color:#64748b;">Visual snapshot will be attached automatically.</div>
-          <div style="display:flex;gap:8px;">
-            <button id="__ag_cancel" style="padding:8px 14px;border-radius:6px;border:1px solid #e2e8f0;background:#f1f5f9;color:#334155;cursor:pointer;font-size:12px;font-weight:500;">Cancel</button>
-            <button id="__ag_send" style="padding:8px 14px;border-radius:6px;border:none;background:#7c3aed;color:#ffffff;cursor:pointer;font-size:12px;font-weight:600;">Send to Agent 🚀</button>
+        <button id="__ag_close" style="background:none;border:none;color:#94a3b8;font-size:13px;cursor:pointer;padding:2px 6px;border-radius:4px;line-height:1;display:flex;align-items:center;justify-content:center;transition:color 0.15s;" title="Close (Esc)">✕</button>
+      </div>
+      <div style="padding:12px 14px;background:#ffffff;">
+        <div style="display:flex;align-items:center;justify-content:space-between;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:6px 10px;margin-bottom:10px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:#475569;">
+          <span id="__ag_selector" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:300px;" title=""></span>
+          <span id="__ag_size" style="color:#94a3b8;flex-shrink:0;margin-left:8px;font-size:10px;"></span>
+        </div>
+        <textarea id="__ag_prompt_input" placeholder="Prompt for Agent (e.g. modify styles, fix layout, inspect data)..." style="width:100%;height:84px;background:#ffffff;border:1px solid #cbd5e1;border-radius:6px;color:#0f172a;padding:8px 10px;font-size:12px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;resize:vertical;outline:none;line-height:1.45;box-sizing:border-box;transition:border-color 0.15s,box-shadow 0.15s;" spellcheck="false"></textarea>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;">
+          <div id="__ag_hint" style="font-size:11px;color:#94a3b8;display:flex;align-items:center;gap:4px;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            <span>Snapshot included</span>
+          </div>
+          <div style="display:flex;gap:6px;">
+            <button id="__ag_cancel" style="padding:5px 12px;border-radius:5px;border:1px solid #e2e8f0;background:#ffffff;color:#475569;cursor:pointer;font-size:12px;font-weight:500;transition:background 0.15s;">Cancel</button>
+            <button id="__ag_send" style="padding:5px 12px;border-radius:5px;border:1px solid #0f172a;background:#0f172a;color:#ffffff;cursor:pointer;font-size:12px;font-weight:500;display:inline-flex;align-items:center;gap:5px;transition:background 0.15s;">
+              <span>Send to Agent</span>
+              <span style="font-size:10px;opacity:0.6;font-family:ui-monospace,monospace;">↵</span>
+            </button>
           </div>
         </div>
       </div>
     </div>`;
   document.documentElement.appendChild(modal);
+
+  /* ---- Dragging for Prompt Modal ------------------------------------------- */
+  var dialog = document.getElementById('__ag_dialog');
+  var header = document.getElementById('__ag_modal_header');
+  var isDragging = false;
+  var dragStartX = 0;
+  var dragStartY = 0;
+  var initialLeft = 0;
+  var initialTop = 0;
+
+  header.addEventListener('mousedown', function (e) {
+    if (e.target.closest('#__ag_close')) return;
+    isDragging = true;
+    dragStartX = e.clientX;
+    dragStartY = e.clientY;
+
+    var rect = dialog.getBoundingClientRect();
+    initialLeft = rect.left;
+    initialTop = rect.top;
+
+    header.style.cursor = 'grabbing';
+    document.body.style.userSelect = 'none';
+
+    function onMouseMove(e) {
+      if (!isDragging) return;
+      var dx = e.clientX - dragStartX;
+      var dy = e.clientY - dragStartY;
+
+      var newLeft = initialLeft + dx;
+      var newTop = initialTop + dy;
+
+      var maxLeft = window.innerWidth - dialog.offsetWidth - 8;
+      var maxTop = window.innerHeight - dialog.offsetHeight - 8;
+      newLeft = Math.max(8, Math.min(maxLeft, newLeft));
+      newTop = Math.max(8, Math.min(maxTop, newTop));
+
+      dialog.style.left = newLeft + 'px';
+      dialog.style.top = newTop + 'px';
+      dialog.style.right = 'auto';
+      dialog.style.bottom = 'auto';
+      dialog.style.margin = '0';
+    }
+
+    function onMouseUp() {
+      if (!isDragging) return;
+      isDragging = false;
+      header.style.cursor = 'grab';
+      document.body.style.userSelect = '';
+      window.removeEventListener('mousemove', onMouseMove, true);
+      window.removeEventListener('mouseup', onMouseUp, true);
+    }
+
+    window.addEventListener('mousemove', onMouseMove, true);
+    window.addEventListener('mouseup', onMouseUp, true);
+  });
+
+  function resetModalPosition() {
+    var w = Math.min(440, window.innerWidth - 32);
+    dialog.style.width = w + 'px';
+    var left = Math.max(16, (window.innerWidth - w) / 2);
+    var top = Math.max(32, (window.innerHeight - 300) / 3);
+    dialog.style.left = left + 'px';
+    dialog.style.top = top + 'px';
+    dialog.style.right = 'auto';
+    dialog.style.bottom = 'auto';
+    dialog.style.margin = '0';
+  }
 
   function getSelector(el) {
     if (el.id) return '#' + el.id;
@@ -233,6 +314,11 @@
     overlay.style.width = r.width + 'px';
     overlay.style.height = r.height + 'px';
     badge.textContent = getSelector(el);
+    if (r.top < 24) {
+      badge.style.top = '2px';
+    } else {
+      badge.style.top = '-22px';
+    }
   }
 
   /* ---- Hover detection (rAF-throttled) ---------------------------------- */
@@ -302,11 +388,28 @@
       selectedElement = e.target;
       currentSnapshotBase64 = null;
 
+      var tagEl = document.getElementById('__ag_element_tag');
+      if (tagEl) tagEl.textContent = selectedElement.tagName.toLowerCase();
+
+      var fullSel = getFullSelector(selectedElement);
       var selectorEl = document.getElementById('__ag_selector');
-      if (selectorEl) selectorEl.textContent = getFullSelector(selectedElement);
+      if (selectorEl) {
+        selectorEl.textContent = fullSel;
+        selectorEl.title = fullSel;
+      }
+
+      var sizeEl = document.getElementById('__ag_size');
+      if (sizeEl) {
+        var rect = selectedElement.getBoundingClientRect();
+        sizeEl.textContent = Math.round(rect.width) + ' × ' + Math.round(rect.height) + ' px';
+      }
+
+      if (!dialog.style.left || parseInt(dialog.style.left, 10) > window.innerWidth - 80 || parseInt(dialog.style.top, 10) > window.innerHeight - 80) {
+        resetModalPosition();
+      }
 
       var inputEl = document.getElementById('__ag_prompt_input');
-      modal.style.display = 'flex';
+      modal.style.display = 'block';
       if (inputEl) {
         inputEl.value = '';
         inputEl.focus();
@@ -425,8 +528,8 @@
     sendBtn.textContent = 'Sent ✓';
     setTimeout(function () {
       sendBtn.disabled = false;
-      sendBtn.textContent = 'Send to Agent 🚀';
-      if (hintEl) hintEl.textContent = 'Visual snapshot will be attached automatically.';
+      sendBtn.innerHTML = '<span>Send to Agent</span><span style="font-size:10px;opacity:0.6;font-family:ui-monospace,monospace;">↵</span>';
+      if (hintEl) hintEl.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>Snapshot included</span>';
     }, 1200);
 
     closeModal();
