@@ -21,7 +21,7 @@ const BLOCKED_HOSTS = new Set([
   'metadata.oraclecloud.com'
 ]);
 
-/* ---------------- Static assets: read once, cache in memory ---------------- */
+/* ---------------- Static assets ---------------- */
 function readAsset(file, label) {
   try {
     return readFileSync(join(__dirname, file), 'utf-8');
@@ -31,14 +31,13 @@ function readAsset(file, label) {
   }
 }
 
-const UI_HTML = readAsset('ui.html', 'sidecar UI');
 const HTML2CANVAS_JS = readAsset('html2canvas.min.js', 'visual snapshot engine');
-const INSPECTOR_JS = readAsset('inspector-runtime.js', 'element inspector runtime');
 
 const UI_FALLBACK = '<!DOCTYPE html><html><body style="font-family:sans-serif;background:#ffffff;color:#0f172a;display:flex;align-items:center;justify-content:center;height:100vh;margin:0">ui.html failed to load. Check sidecar logs.</body></html>';
 
 function serveUI() {
-  return new Response(UI_HTML ?? UI_FALLBACK, { contentType: 'text/html; charset=utf-8' });
+  const uiHtml = readAsset('ui.html', 'sidecar UI');
+  return new Response(uiHtml ?? UI_FALLBACK, { contentType: 'text/html; charset=utf-8' });
 }
 app.page('/ui.html', serveUI);
 app.page('/', serveUI);
@@ -110,9 +109,10 @@ function injectRuntime(html, finalUrl) {
   html = html.replace(/<meta[^>]+http-equiv\s*=\s*["']?content-security-policy["']?[^>]*>/gi, '');
 
   const safeBase = escapeHtml(finalUrl);
+  const inspectorJs = readAsset('inspector-runtime.js', 'element inspector runtime');
   const inject =
     `<script src="/html2canvas.js"><\/script>\n` +
-    `<script>window.__AG_TARGET_URL = ${JSON.stringify(finalUrl)};\n${INSPECTOR_JS ?? ''}\n<\/script>\n` +
+    `<script>window.__AG_TARGET_URL = ${JSON.stringify(finalUrl)};\n${inspectorJs ?? ''}\n<\/script>\n` +
     `<base href="${safeBase}">`;
 
   // Handle <head> with attributes (<head lang="en"> etc.); otherwise injecting
