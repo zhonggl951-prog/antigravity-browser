@@ -256,21 +256,37 @@
 
   /* ---- Visual snapshot ---------------------------------------------------- */
   async function captureElementSnapshot(el) {
-    if (typeof html2canvas === 'function' && el) {
-      try {
-        const canvas = await html2canvas(el, {
-          logging: false,
-          useCORS: true,
-          allowTaint: false, // tainted canvas makes toDataURL() throw
-          scale: 1.5,
-          backgroundColor: null
-        });
+    if (typeof html2canvas !== 'function' || !el) return null;
+    try {
+      var capturePromise = html2canvas(el, {
+        logging: false,
+        useCORS: false,
+        allowTaint: false,
+        scale: 1,
+        backgroundColor: null,
+        ignoreElements: function (node) {
+          if (!node || !node.tagName) return false;
+          var tag = node.tagName.toLowerCase();
+          if (tag === 'canvas' || tag === 'video' || tag === 'iframe') return true;
+          if (node.id === '__ag_modal' || node.id === '__ag_overlay') return true;
+          return false;
+        }
+      }).then(function (canvas) {
         return canvas.toDataURL('image/png');
-      } catch (err) {
+      }).catch(function (err) {
         console.warn('[browser-plugin] html2canvas capture error:', err);
-      }
+        return null;
+      });
+
+      var timeoutPromise = new Promise(function (resolve) {
+        setTimeout(function () { resolve(null); }, 2500);
+      });
+
+      return await Promise.race([capturePromise, timeoutPromise]);
+    } catch (err) {
+      console.warn('[browser-plugin] html2canvas error:', err);
+      return null;
     }
-    return null;
   }
 
   /* ---- Click handling ------------------------------------------------------ */
@@ -295,11 +311,6 @@
         inputEl.value = '';
         inputEl.focus();
       }
-
-      // Kick off snapshot capture in parallel with typing
-      captureElementSnapshot(selectedElement).then(function (b64) {
-        currentSnapshotBase64 = b64;
-      });
       return;
     }
 
