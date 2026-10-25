@@ -1,6 +1,11 @@
+<div align="center">
+
 # antigravity-browser
 
-<p align="left">
+**In-IDE Web Browser & Visual Element Inspector for Google Antigravity Aux Pane**
+
+<!-- badges -->
+<p align="center">
   <a href="https://github.com/zhonggl951-prog/antigravity-browser/releases"><img src="https://img.shields.io/github/v/release/zhonggl951-prog/antigravity-browser?style=flat-square&color=blue" alt="Release"></a>
   <a href="https://github.com/zhonggl951-prog/antigravity-browser/actions/workflows/validate.yml"><img src="https://img.shields.io/github/actions/workflow/status/zhonggl951-prog/antigravity-browser/validate.yml?branch=main&style=flat-square" alt="Build Status"></a>
   <a href="https://github.com/zhonggl951-prog/antigravity-browser"><img src="https://img.shields.io/github/stars/zhonggl951-prog/antigravity-browser?style=flat-square&logo=github" alt="Stars"></a>
@@ -9,7 +14,16 @@
   <img src="https://img.shields.io/badge/platform-Antigravity%20Plugin-blue.svg?style=flat-square" alt="Platform">
 </p>
 
-An in-IDE web browser and visual element inspector plugin for Google Antigravity's Aux Pane. It allows developers to browse documentation, preview local development servers, select DOM elements, generate visual snapshots, and submit targeted modification prompts directly to their AI agent.
+<!-- language switcher -->
+<p align="center">
+  <strong>English</strong> | <a href="README_zh-CN.md">简体中文</a>
+</p>
+
+</div>
+
+---
+
+`antigravity-browser` is an in-IDE web browser and visual element inspector plugin designed for Google Antigravity's Aux Pane. It allows developers to browse external documentation and preview local development servers right inside the IDE, select DOM elements with a single click, generate visual snapshots, and submit structured modification prompts directly to their AI agent.
 
 <p align="center">
   <img src="assets/preview.svg" alt="Antigravity Browser Preview" width="100%">
@@ -17,7 +31,7 @@ An in-IDE web browser and visual element inspector plugin for Google Antigravity
 
 ## Features
 
-- **Aux Pane In-IDE Browsing**: Operates inside Antigravity's auxiliary side panel without occupying or splitting the main editor workspace.
+- **Aux Pane In-IDE Browsing**: Operates inside Antigravity's auxiliary side panel without occupying or splitting the primary editor workspace.
 - **Visual Element Inspector (Inspect)**: Hover over any DOM element on the page to highlight its bounding box and CSS selector. Clicking an element opens a prompt dialog that bundles the element's selector, outer HTML snippet, and rendered canvas snapshot into a structured prompt for the agent.
 - **Local Reactive App Support**: Built-in WebSocket target rewriting allows local reactive apps (such as R Shiny, Streamlit, Jupyter, and Vite HMR) to maintain persistent WebSocket connections through the sidecar proxy without disconnection errors.
 - **Dual Execution Modes**:
@@ -32,24 +46,31 @@ An in-IDE web browser and visual element inspector plugin for Google Antigravity
 - **Local Scientific & Data Apps**: Preview R Shiny dashboards, Streamlit apps, and Gradio tools side-by-side with your analysis scripts.
 - **API & Docs Reference**: Browse MDN Web Docs, GitHub repositories, and package documentation without leaving the IDE.
 
-## Installation
+## Quick Start
+
+### In Agent Workflow
+
+Copy and send this instruction directly to your Antigravity agent:
+
+```text
+Please install the antigravity-browser plugin: Clone https://github.com/zhonggl951-prog/antigravity-browser.git into the local plugins directory (macOS/Linux: ~/.gemini/config/plugins/browser, Windows: $env:USERPROFILE\.gemini\config\plugins\browser), run `agy plugin validate` to confirm integrity, and open the sidecar panel at sidecar://browser/web_browser/ui.html.
+```
+
+### Manual Installation
 
 Clone this repository into your Antigravity plugins directory:
 
-### macOS / Linux
-
+#### macOS / Linux
 ```bash
 git clone https://github.com/zhonggl951-prog/antigravity-browser.git ~/.gemini/config/plugins/browser
 ```
 
-### Windows (PowerShell)
-
+#### Windows (PowerShell)
 ```powershell
 git clone https://github.com/zhonggl951-prog/antigravity-browser.git $env:USERPROFILE\.gemini\config\plugins\browser
 ```
 
 Validate the installation with the Antigravity CLI:
-
 ```bash
 agy plugin validate ~/.gemini/config/plugins/browser
 ```
@@ -86,7 +107,8 @@ antigravity-browser/
 │       └── validate.yml      # CI workflow for configuration and syntax checks
 ├── CONTRIBUTING.md           # Contribution guidelines
 ├── LICENSE                   # MIT License
-└── README.md                 # Project documentation
+├── README.md                 # Documentation (English)
+└── README_zh-CN.md           # Documentation (Simplified Chinese)
 ```
 
 ## Requirements
