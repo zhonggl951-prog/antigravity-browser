@@ -1,0 +1,20 @@
+{
+  "command": "node",
+  "args": [
+    "server.mjs"
+  ],
+  "display_name": "Web Browser",
+  "description": "In-IDE Web Browser sidecar in Aux Pane",
+  "has_web_ui": true,
+  "restart_policy": "always",
+  "ui_config": {
+    "display_name": "Web Browser",
+    "views": [
+      {
+        "entrypoint": "SIDECAR_UI_ENTRYPOINT_AUX_PANE",
+        "path": "/ui.html",
+        "title": "Web Browser"
+      }
+    ]
+  }
+}

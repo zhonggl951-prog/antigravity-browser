@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Web Browser & Visual Inspector</title>
+  <!-- Antigravity Sidecar SDK Preload Bridge -->
+  <script src="/preload.js"></script>
+
+  <style>
+    :root {
+      --bg-primary: #ffffff;
+      --bg-secondary: #f8fafc;
+      --bg-hover: #f1f5f9;
+      --border-color: #e2e8f0;
+      --text-primary: #0f172a;
+      --text-secondary: #64748b;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --proxy-active: #10b981;
+      --inspect-active: #7c3aed;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      padding: 8px 12px;
+      gap: 8px;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-color);
+      flex-shrink: 0;
+    }
+
+    .btn {
+      height: 32px;
+      min-width: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 8px;
+      background: transparent;
+      border: none;
+      border-radius: 6px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 15px;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .btn:hover:not(:disabled) {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+    }
+
+    .btn:active:not(:disabled) {
+      transform: scale(0.97);
+    }
+
+    .btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
+    .nav-group {
+      display: flex;
+      gap: 2px;
+    }
+
+    .url-bar-wrapper {
+      flex: 1;
+      position: relative;
+    }
+
+    .url-input {
+      width: 100%;
+      height: 32px;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 0 14px 0 36px;
+      color: var(--text-primary);
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .url-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+    }
+
+    .url-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 13px;
+      color: var(--proxy-active);
+    }
+
+    .url-input.inactive + .url-icon {
+      color: var(--text-secondary);
+    }
+
+    .btn-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 0 9px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      background: #ffffff;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      user-select: none;
+    }
+
+    .btn-badge:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+    }
+
+    .btn-badge.proxy {
+      background: #f5f3ff;
+      border-color: #ddd6fe;
+      color: #7c3aed;
+    }
+
+    .btn-badge.direct {
+      background: #ecfdf5;
+      border-color: #a7f3d0;
+      color: #059669;
+    }
+
+    #btn-inspect.active {
+      background: rgba(124, 58, 237, 0.12);
+      color: var(--inspect-active);
+    }
+
+    #btn-inspect.active:hover {
+      background: rgba(124, 58, 237, 0.2);
+      color: var(--inspect-active);
+    }
+
+    .inspector-banner {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 6px 12px;
+      background: linear-gradient(90deg, rgba(124, 58, 237, 0.08), rgba(124, 58, 237, 0.04), rgba(124, 58, 237, 0.08));
+      border-bottom: 1px solid rgba(124, 58, 237, 0.2);
+      color: #6d28d9;
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+
+    .inspector-banner.show {
+      display: flex;
+    }
+
+    .inspector-banner kbd {
+      background: #ede9fe;
+      border: 1px solid #c4b5fd;
+      border-radius: 3px;
+      padding: 1px 5px;
+      font-size: 10px;
+      font-family: inherit;
+      color: #5b21b6;
+    }
+
+    #btn-exit-inspect {
+      background: #ffffff;
+      color: #6d28d9;
+      border: 1px solid #c4b5fd;
+      border-radius: 4px;
+      padding: 2px 8px;
+      font-size: 11px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    #btn-exit-inspect:hover {
+      background: #f5f3ff;
+    }
+
+    .viewport {
+      flex: 1;
+      position: relative;
+      background: #fff;
+      overflow: hidden;
+    }
+
+    #web-frame {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: #fff;
+      display: block;
+    }
+
+    .loading-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.75);
+      z-index: 10;
+    }
+
+    .loading-overlay.show {
+      display: flex;
+    }
+
+    .spinner {
+      width: 28px;
+      height: 28px;
+      border: 3px solid rgba(0, 0, 0, 0.1);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .home-dashboard {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-primary);
+      z-index: 5;
+    }
+
+    .home-dashboard.hidden {
+      display: none;
+    }
+
+    .home-title {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .home-subtitle {
+      color: var(--text-secondary);
+      font-size: 13px;
+      margin-bottom: 36px;
+    }
+
+    .quick-links {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: 640px;
+    }
+
+    .quick-card {
+      width: 150px;
+      padding: 16px;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+
+    .quick-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-3px);
+      background: #f8fafc;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    }
+
+    .quick-card .icon {
+      font-size: 26px;
+      margin-bottom: 8px;
+    }
+
+    .quick-card .name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .quick-card .desc {
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #1e293b;
+      color: #ffffff;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      border: 1px solid #334155;
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+      z-index: 1000;
+      max-width: 90%;
+      text-align: center;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <div class="nav-group">
+      <button class="btn" id="btn-back" title="Back">←</button>
+      <button class="btn" id="btn-forward" title="Forward">→</button>
+    </div>
+    <button class="btn" id="btn-refresh" title="Refresh">↻</button>
+    <button class="btn" id="btn-home" title="Home">⌂</button>
+
+    <div class="url-bar-wrapper">
+      <span class="url-icon">🔒</span>
+      <input type="text" class="url-input" id="url-input" placeholder="输入网址或搜索 (支持本地应用 http://127.0.0.1:7123)…" spellcheck="false" autocomplete="off" />
+    </div>
+
+    <button class="btn btn-badge proxy" id="btn-mode" title="模式切换：Proxy (穿透检查模式) / Direct (原生直连模式)">🛡️ Proxy</button>
+    <button class="btn" id="btn-inspect" title="Visual Element Inspector (Pick a component & send it to the agent)">🎯</button>
+    <button class="btn" id="btn-external" title="Open in system browser">↗</button>
+  </div>
+
+  <div class="inspector-banner" id="inspector-banner">
+    <span>🎯 <strong>Inspect Mode</strong> — 点击任意组件以选择，然后描述你想要的修改</span>
+    <kbd>Esc</kbd>
+    <span>或</span>
+    <button id="btn-exit-inspect">退出检查模式</button>
+  </div>
+
+  <div class="viewport">
+    <div class="home-dashboard" id="home-dashboard">
+      <div class="home-title">🌐 Web Browser</div>
+      <div class="home-subtitle">支持本地生信工具与外部网页 · 目标元素检查器与视觉快照已就绪</div>
+      <div class="quick-links">
+        <div class="quick-card" data-url="http://127.0.0.1:7123">
+          <div class="icon">🧬</div>
+          <div class="name">scRNAseq</div>
+          <div class="desc">本地单细胞网页工具</div>
+        </div>
+        <div class="quick-card" data-url="https://duckduckgo.com">
+          <div class="icon">🦆</div>
+          <div class="name">DuckDuckGo</div>
+          <div class="desc">Privacy-first search</div>
+        </div>
+        <div class="quick-card" data-url="https://github.com">
+          <div class="icon">🐙</div>
+          <div class="name">GitHub</div>
+          <div class="desc">Code hosting</div>
+        </div>
+        <div class="quick-card" data-url="https://news.ycombinator.com">
+          <div class="icon">🗣️</div>
+          <div class="name">Hacker News</div>
+          <div class="desc">Tech news</div>
+        </div>
+        <div class="quick-card" data-url="https://developer.mozilla.org">
+          <div class="icon">📚</div>
+          <div class="name">MDN Docs</div>
+          <div class="desc">Web reference</div>
+        </div>
+      </div>
+    </div>
+
+    <iframe id="web-frame" src="about:blank" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"></iframe>
+
+    <div class="loading-overlay" id="loading-overlay">
+      <div class="spinner"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const urlInput = document.getElementById('url-input');
+    const btnBack = document.getElementById('btn-back');
+    const btnForward = document.getElementById('btn-forward');
+    const btnRefresh = document.getElementById('btn-refresh');
+    const btnHome = document.getElementById('btn-home');
+    const btnInspect = document.getElementById('btn-inspect');
+    const btnMode = document.getElementById('btn-mode');
+    const btnExternal = document.getElementById('btn-external');
+    const btnExitInspect = document.getElementById('btn-exit-inspect');
+    const webFrame = document.getElementById('web-frame');
+    const homeDashboard = document.getElementById('home-dashboard');
+    const inspectorBanner = document.getElementById('inspector-banner');
+    const loadingOverlay = document.getElementById('loading-overlay');
+    const toast = document.getElementById('toast');
+
+    let historyStack = [];
+    let historyIndex = -1;
+    let currentRawUrl = '';
+    let currentMode = 'proxy'; // 'proxy' or 'direct'
+    let isInspectActive = false;
+    let toastTimer = null;
+
+    function updateModeButton() {
+      if (currentMode === 'proxy') {
+        btnMode.textContent = '🛡️ Proxy';
+        btnMode.className = 'btn btn-badge proxy';
+        btnMode.title = '当前模式: Proxy 穿透检查模式 (支持元素点选与多模态快照)';
+      } else {
+        btnMode.textContent = '⚡ Direct';
+        btnMode.className = 'btn btn-badge direct';
+        btnMode.title = '当前模式: Direct 原生直连模式 (适合原生交互本地工具)';
+      }
+    }
+
+    btnMode.addEventListener('click', () => {
+      currentMode = currentMode === 'proxy' ? 'direct' : 'proxy';
+      updateModeButton();
+      showToast(`已切换至 ${currentMode === 'proxy' ? '🛡️ Proxy 代理模式' : '⚡ Direct 直连模式'}`);
+      if (currentRawUrl) {
+        navigateTo(currentRawUrl, false);
+      }
+    });
+
+    function showToast(msg, duration = 4000) {
+      clearTimeout(toastTimer); // a new toast cancels any pending hide
+      toast.textContent = msg;
+      toast.classList.add('show');
+      toastTimer = setTimeout(() => toast.classList.remove('show'), duration);
+    }
+
+    function updateNavButtons() {
+      btnBack.disabled = historyIndex <= 0;
+      btnForward.disabled = historyIndex >= historyStack.length - 1;
+    }
+
+    function showLoading() { loadingOverlay.classList.add('show'); }
+    function hideLoading() { loadingOverlay.classList.remove('show'); }
+
+    function setInspectMode(active) {
+      isInspectActive = active;
+      btnInspect.classList.toggle('active', active);
+      inspectorBanner.classList.toggle('show', active);
+      // Re-apply the mode inside the proxied page
+      try {
+        webFrame.contentWindow.postMessage({ type: 'SET_INSPECTOR', active }, location.origin);
+      } catch (e) {}
+    }
+
+    btnInspect.addEventListener('click', () => {
+      if (currentMode === 'direct') {
+        showToast('ℹ️ Direct 直连模式使用原生内嵌。若需点选组件并截取快照发给 Agent，请先点击顶部切换为 🛡️ Proxy 模式。', 4500);
+        return;
+      }
+      if (!currentRawUrl) {
+        showToast('ℹ️ Navigate to a page first, then use the element inspector.');
+        return;
+      }
+      setInspectMode(!isInspectActive);
+    });
+
+    btnExitInspect.addEventListener('click', () => setInspectMode(false));
+
+    // Esc exits inspect mode even when focus is outside the iframe
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && isInspectActive) setInspectMode(false);
+    });
+
+    function navigateTo(input, addHistory = true) {
+      let trimmed = input.trim();
+      if (!trimmed) return;
+
+      let url = trimmed;
+      if (url.startsWith('localhost:') || url.startsWith('127.0.0.1:')) {
+        url = 'http://' + url;
+      } else if (!/^https?:\/\//i.test(url)) {
+        if (url.includes('.') && !url.includes(' ')) {
+          url = 'https://' + url;
+        } else {
+          url = 'https://duckduckgo.com/?q=' + encodeURIComponent(url);
+        }
+      }
+
+      currentRawUrl = url;
+      urlInput.value = url;
+      homeDashboard.classList.add('hidden');
+      showLoading();
+
+      if (addHistory) {
+        historyStack = historyStack.slice(0, historyIndex + 1);
+        historyStack.push({ url });
+        historyIndex++;
+        updateNavButtons();
+      }
+
+      if (currentMode === 'direct') {
+        webFrame.src = url;
+      } else {
+        webFrame.src = '/api/proxy?url=' + encodeURIComponent(url);
+      }
+    }
+
+    urlInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') navigateTo(urlInput.value);
+    });
+
+    document.querySelector('.url-bar-wrapper').addEventListener('click', (e) => {
+      if (e.target === urlInput) urlInput.select();
+    });
+
+    btnRefresh.addEventListener('click', () => {
+      if (currentRawUrl) {
+        showLoading();
+        webFrame.src = webFrame.src;
+      }
+    });
+
+    btnHome.addEventListener('click', () => {
+      currentRawUrl = '';
+      urlInput.value = '';
+      webFrame.src = 'about:blank';
+      homeDashboard.classList.remove('hidden');
+      hideLoading();
+      setInspectMode(false);
+    });
+
+    btnBack.addEventListener('click', () => {
+      if (historyIndex > 0) {
+        historyIndex--;
+        updateNavButtons();
+        navigateTo(historyStack[historyIndex].url, false);
+      }
+    });
+
+    btnForward.addEventListener('click', () => {
+      if (historyIndex < historyStack.length - 1) {
+        historyIndex++;
+        updateNavButtons();
+        navigateTo(historyStack[historyIndex].url, false);
+      }
+    });
+
+    // NOTE: reloading a history entry re-fetches it through the proxy; the
+    // destination page therefore re-runs its own (untrusted) scripts.
+    webFrame.addEventListener('load', () => {
+      hideLoading();
+      // After a navigation, re-assert inspect mode if it is still on
+      if (isInspectActive) {
+        setTimeout(() => {
+          try {
+            webFrame.contentWindow.postMessage({ type: 'SET_INSPECTOR', active: true }, location.origin);
+          } catch (e) {}
+        }, 100);
+      }
+    });
+
+    // Quick Cards
+    document.querySelectorAll('[data-url]').forEach(el => {
+      el.addEventListener('click', () => navigateTo(el.getAttribute('data-url')));
+    });
+
+    btnExternal.addEventListener('click', async () => {
+      if (!currentRawUrl) return;
+      try {
+        const resp = await fetch('/api/open-external', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: currentRawUrl })
+        });
+        const data = await resp.json();
+        if (!data.ok) throw new Error(data.error || 'open failed');
+        showToast('↗️ Opening in your system browser…');
+      } catch (err) {
+        // Server-side opener failed (missing xdg-open / rundll32 etc.)
+        window.open(currentRawUrl, '_blank');
+      }
+    });
+
+    /* ---- Messages from the proxied page ----------------------------------
+     * The proxied page runs UNTRUSTED JavaScript (it's the website's own code,
+     * same-origin with us because it's served through /api/proxy). Treat every
+     * message accordingly:
+     *   - only accept messages from OUR iframe (e.source check)
+     *   - INSPECTOR_SUBMIT is only honored while the user has explicitly
+     *     turned inspect mode ON — otherwise any visited site could inject
+     *     arbitrary prompts into the agent conversation.
+     */
+    window.addEventListener('message', async (e) => {
+      if (!e.data || typeof e.data.type !== 'string') return;
+      if (e.source !== webFrame.contentWindow) return;
+
+      if (e.data.type === 'NAVIGATE' && e.data.url) {
+        const u = String(e.data.url);
+        if (/^https?:\/\//i.test(u)) navigateTo(u, true);
+      } else if (e.data.type === 'INSPECTOR_STATE_CHANGE') {
+        if (!e.data.active && isInspectActive) setInspectMode(false);
+      } else if (e.data.type === 'PROXY_NOTICE' && e.data.message) {
+        showToast('ℹ️ ' + e.data.message, 5000);
+      } else if (e.data.type === 'INSPECTOR_SUBMIT' && e.data.payload) {
+        // Security gate: never accept submissions unless inspect mode is on
+        if (!isInspectActive) return;
+
+        const p = e.data.payload;
+        setInspectMode(false);
+
+        // Persist the visual snapshot server-side
+        let snapshotUrl = null;
+        if (p.snapshot) {
+          try {
+            const resp = await fetch('/api/save-snapshot', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                base64: p.snapshot,
+                conversationId: window.sidecar?.conversationId
+              })
+            });
+            const sData = await resp.json();
+            if (sData.ok && sData.fileUrl) snapshotUrl = sData.fileUrl;
+          } catch (err) {
+            console.warn('[browser-plugin] snapshot save failed:', err);
+          }
+        }
+
+        const snapshotSection = snapshotUrl
+          ? `\n- **组件视觉快照 (Visual Snapshot)**:\n![Component Snapshot](${snapshotUrl})\n`
+          : '';
+
+        const promptText = `I selected a component on a webpage and want your help with it.
+
+**Selected Component Details:**
+- **URL**: ${p.url || 'N/A'}
+- **CSS Selector**: \`${p.selector || 'N/A'}\`
+- **HTML Snippet**:
+\`\`\`html
+${p.htmlSnippet || 'N/A'}
+\`\`\`
+- **Visible Text**: ${p.innerText || 'N/A'}
+${snapshotSection}
+**My Request:**
+${p.prompt}
+
+The snapshot is saved locally as a file. Please analyze it (use your file-reading capabilities if needed) and help me with my request.`;
+
+        if (window.sidecar && window.sidecar.agent && typeof window.sidecar.agent.sendMessage === 'function') {
+          window.sidecar.agent.sendMessage(promptText)
+            .then(() => showToast('✅ Component & Visual Snapshot sent to agent! (Check your chat)', 5000))
+            .catch((err) => {
+              console.warn('[browser-plugin] agent send failed:', err);
+              copyFallback(promptText);
+            });
+        } else {
+          copyFallback(promptText);
+        }
+      }
+    });
+
+    function copyFallback(text) {
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(() => {
+          showToast('📋 Request copied to clipboard, paste into chat on the left!', 5000);
+        }).catch(() => {
+          showToast('Request generated. Paste into chat on the left.', 4000);
+        });
+      } else {
+        showToast('Request generated. Paste into chat on the left.', 4000);
+      }
+    }
+  </script>
+</body>
+</html>
