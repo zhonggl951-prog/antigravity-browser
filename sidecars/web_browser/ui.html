@@ -773,8 +773,17 @@
       btnForward.disabled = historyIndex >= historyStack.length - 1;
     }
 
-    function showLoading() { loadingOverlay.classList.add('show'); }
-    function hideLoading() { loadingOverlay.classList.remove('show'); }
+    let loadingTimer = null;
+    function showLoading() {
+      loadingOverlay.classList.add('show');
+      clearTimeout(loadingTimer);
+      // Fail-safe: auto-hide after 2.2s so the spinner NEVER locks the UI
+      loadingTimer = setTimeout(hideLoading, 2200);
+    }
+    function hideLoading() {
+      clearTimeout(loadingTimer);
+      loadingOverlay.classList.remove('show');
+    }
 
     function setInspectMode(active) {
       isInspectActive = active;
@@ -782,7 +791,7 @@
       inspectorBanner.classList.toggle('show', active);
       // Re-apply the mode inside the proxied page
       try {
-        webFrame.contentWindow.postMessage({ type: 'SET_INSPECTOR', active }, location.origin);
+        webFrame.contentWindow.postMessage({ type: 'SET_INSPECTOR', active }, '*');
       } catch (e) {}
     }
 
@@ -791,13 +800,15 @@
         showToast('Navigate to a page first, then use the element inspector.', 3500);
         return;
       }
-      // If currently running in Direct mode, seamlessly switch to Proxy mode so inspector runtime is available
+      // If currently running in Direct mode, seamlessly switch to Proxy mode with autoInspect=true
       if (effectiveMode === 'direct') {
-        showToast('Enabling Inspector (switching to proxy mode)...', 2500);
+        showToast('Enabling Inspector (loading with inspector runtime)...', 2200);
         effectiveMode = 'proxy';
         updateModeButton();
-        navigateTo(currentRawUrl, false, 'proxy');
-        setTimeout(() => setInspectMode(true), 450);
+        isInspectActive = true;
+        btnInspect.classList.add('active');
+        inspectorBanner.classList.add('show');
+        navigateTo(currentRawUrl, false, 'proxy', true);
         return;
       }
       setInspectMode(!isInspectActive);
@@ -810,7 +821,7 @@
       if (e.key === 'Escape' && isInspectActive) setInspectMode(false);
     });
 
-    function navigateTo(input, addHistory = true, forcedEffectiveMode = null) {
+    function navigateTo(input, addHistory = true, forcedEffectiveMode = null, autoInspect = false) {
       let trimmed = input.trim();
       if (!trimmed) return;
 
@@ -861,7 +872,7 @@
       if (effectiveMode === 'direct') {
         webFrame.src = url;
       } else {
-        webFrame.src = '/api/proxy?url=' + encodeURIComponent(url);
+        webFrame.src = '/api/proxy?url=' + encodeURIComponent(url) + (autoInspect ? '&inspect=1' : '');
       }
     }
 

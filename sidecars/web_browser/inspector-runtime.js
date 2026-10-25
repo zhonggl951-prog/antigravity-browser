@@ -14,8 +14,8 @@
   window.__AG_INSPECTOR_READY = true;
 
   // The proxied document is same-origin with the parent UI (both are served by
-  // the sidecar). Use the concrete origin when available; '*' only as a last
-  // resort for opaque origins.
+  // the sidecar). Capture the real sidecar origin BEFORE history.replaceState changes location.
+  var SIDECAR_ORIGIN = location.protocol + '//' + location.host;
   var TARGET_ORIGIN = (location.origin && location.origin !== 'null') ? location.origin : '*';
 
   function postToParent(msg) {
@@ -52,8 +52,10 @@
             if (urlStr) {
               var resolved = new URL(urlStr, document.baseURI || rawTargetForFetch);
               // If targeting the external website from our sidecar host, proxy it through /api/proxy to bypass CORS
-              if (resolved.origin === parsedTargetOrigin && resolved.origin !== location.origin) {
-                var proxyUrl = '/api/proxy?url=' + encodeURIComponent(resolved.href);
+              if (resolved.origin === parsedTargetOrigin && resolved.origin !== SIDECAR_ORIGIN) {
+                var isRSC = (resolved.search && resolved.search.indexOf('_rsc=') !== -1) ||
+                            (init && init.headers && (init.headers.RSC || init.headers['rsc'] || (init.headers.get && init.headers.get('RSC'))));
+                var proxyUrl = SIDECAR_ORIGIN + '/api/proxy?url=' + encodeURIComponent(resolved.href) + (isRSC ? '&rsc=1' : '');
                 if (typeof input === 'string') {
                   return origFetch.call(this, proxyUrl, init);
                 } else if (input instanceof Request) {
@@ -73,8 +75,9 @@
           try {
             if (typeof url === 'string') {
               var resolvedXhr = new URL(url, document.baseURI || rawTargetForFetch);
-              if (resolvedXhr.origin === parsedTargetOrigin && resolvedXhr.origin !== location.origin) {
-                url = '/api/proxy?url=' + encodeURIComponent(resolvedXhr.href);
+              if (resolvedXhr.origin === parsedTargetOrigin && resolvedXhr.origin !== SIDECAR_ORIGIN) {
+                var isRSCXhr = resolvedXhr.search && resolvedXhr.search.indexOf('_rsc=') !== -1;
+                url = SIDECAR_ORIGIN + '/api/proxy?url=' + encodeURIComponent(resolvedXhr.href) + (isRSCXhr ? '&rsc=1' : '');
               }
             }
           } catch (e) {}
@@ -613,4 +616,12 @@
     if (e.source !== window.parent) return;
     if (e.data && e.data.type === 'SET_INSPECTOR') setInspector(!!e.data.active);
   });
+
+  try {
+    if (window.__AG_AUTO_INSPECT) {
+      setTimeout(function () {
+        setInspector(true);
+      }, 50);
+    }
+  } catch (e) {}
 })();

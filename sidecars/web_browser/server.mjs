@@ -108,7 +108,7 @@ function decodeBodyText(buf, contentType) {
  * resolves against the EXTERNAL site, so the library would be requested from
  * the visited website (and 404) instead of from this sidecar.
  */
-function injectRuntime(html, finalUrl) {
+function injectRuntime(html, finalUrl, autoInspect = false) {
   // A meta CSP on the visited page would block our injected runtime; strip it.
   // (Header-based CSP is already dropped because we build a fresh Response.)
   html = html.replace(/<meta[^>]+http-equiv\s*=\s*["']?content-security-policy["']?[^>]*>/gi, '');
@@ -117,7 +117,9 @@ function injectRuntime(html, finalUrl) {
   const inspectorJs = readAsset('inspector-runtime.js', 'element inspector runtime');
   const inject =
     `<script src="/html2canvas.js"><\/script>\n` +
-    `<script>window.__AG_TARGET_URL = ${JSON.stringify(finalUrl)};\n${inspectorJs ?? ''}\n<\/script>\n` +
+    `<script>window.__AG_TARGET_URL = ${JSON.stringify(finalUrl)};\n` +
+    `window.__AG_AUTO_INSPECT = ${autoInspect ? 'true' : 'false'};\n` +
+    `${inspectorJs ?? ''}\n<\/script>\n` +
     `<base href="${safeBase}">`;
 
   // Handle <head> with attributes (<head lang="en"> etc.); otherwise injecting
@@ -206,23 +208,35 @@ app.api('/api/proxy', async (data) => {
       return errorJson(403, 'Blocked host');
     }
 
+    const isAutoInspect = data && (data.inspect === '1' || data.inspect === 'true');
+    const isRSC = data && (data.rsc === '1' || data.rsc === 'true' || resolvedUrl.includes('_rsc='));
+
     const headerFile = join(tmpdir(), `agb_hdr_${randomUUID()}.txt`);
     const bodyFile = join(tmpdir(), `agb_body_${randomUUID()}.bin`);
 
     return await new Promise((resolve) => {
-      const curl = spawn('curl', [
+      const curlArgs = [
         '-sL',
         '--compressed',
         '-m', '30',
         '--max-filesize', String(MAX_BODY_BYTES),
         '-A', UA,
-        '-H', 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
         '-H', 'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
         '-D', headerFile,
         '-o', bodyFile,              // body goes to disk (no memory buffering)
-        '-w', '%{url_effective}',    // stdout carries ONLY the final URL
-        resolvedUrl
-      ]);
+        '-w', '%{url_effective}'     // stdout carries ONLY the final URL
+      ];
+
+      if (isRSC) {
+        curlArgs.push('-H', 'RSC: 1');
+        curlArgs.push('-H', 'Accept: text/x-component, */*');
+      } else {
+        curlArgs.push('-H', 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8');
+      }
+
+      curlArgs.push(resolvedUrl);
+
+      const curl = spawn('curl', curlArgs);
 
       // stdout is just the effective (post-redirect) URL — guard against runaway output
       let effUrl = '';
@@ -278,7 +292,12 @@ app.api('/api/proxy', async (data) => {
           }
           return done(new Response(Buffer.alloc(0), {
             contentType: contentType || 'application/octet-stream',
-            status: statusCode
+            status: statusCode,
+            headers: {
+              'Access-Control-Allow-Origin': '*',
+              'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS, HEAD',
+              'Access-Control-Allow-Headers': '*'
+            }
           }));
         }
 
@@ -288,9 +307,9 @@ app.api('/api/proxy', async (data) => {
         const isHtml = /text\/html|application\/xhtml\+xml/i.test(contentType)
           || (!contentType && looksHtml);
 
-        if (isHtml) {
+        if (isHtml && !isRSC) {
           const html = decodeBodyText(body, contentType || '');
-          return done(new Response(injectRuntime(html, finalUrl), {
+          return done(new Response(injectRuntime(html, finalUrl, isAutoInspect), {
             contentType: 'text/html; charset=utf-8',
             status: statusCode,
             headers: {
